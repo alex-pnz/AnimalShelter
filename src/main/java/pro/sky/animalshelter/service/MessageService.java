@@ -6,10 +6,14 @@ import com.pengrad.telegrambot.response.SendResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pro.sky.animalshelter.model.AnimalType;
+import pro.sky.animalshelter.model.Shelter;
 import pro.sky.animalshelter.model.Visit;
 import pro.sky.animalshelter.model.Visitor;
+import pro.sky.animalshelter.repository.ShelterRepository;
 import pro.sky.animalshelter.repository.VisitRepository;
 import pro.sky.animalshelter.repository.VisitorRepository;
+
+import java.time.LocalTime;
 
 import static pro.sky.animalshelter.utils.Constants.*;
 
@@ -22,6 +26,8 @@ public class MessageService {
     private VisitorRepository visitorRepository;
     @Autowired
     private VisitRepository visitRepository;
+    @Autowired
+    private ShelterRepository shelterRepository;
     private SendMessage sendMessage = null;
 
     /**
@@ -49,6 +55,16 @@ public class MessageService {
             sendMessage = new SendMessage(chatId, DOG_SHELTER_DESCRIPTION);
             return bot.execute(sendMessage);
         }
+        return null;
+    }
+    /**
+     * Выводит информацию о расписании в выбранном приюте
+     *
+     * @param chatId указать номер чата, в который бот отправит сообщение
+     */
+    public SendResponse showShelterSchedule(Long chatId) {
+        sendMessage = new SendMessage(chatId, SHELTER_SCHEDULE);
+
         return null;
     }
     /**

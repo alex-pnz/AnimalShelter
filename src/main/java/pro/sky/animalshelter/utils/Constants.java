@@ -24,6 +24,9 @@ public class Constants {
                     \uD83D\uDCE7 security@dev.pro
                     """;
 
+    public static String SHELTER_SCHEDULE = """
+            Наши двери открыты для посещения каждый день с 10.00 до 18.00 без выхожных и праздничных дней!""";
+
     public static String DOG_SHELTER_SAFETY = """
             ПРАВИЛА ПОВЕДЕНИЯ НА ТЕРРИТОРИИ ПРИЮТА:
             1. После входа и выхода из вольеров тщательно следить за тем, чтобы двери были хорошо закрыты на щеколду.
