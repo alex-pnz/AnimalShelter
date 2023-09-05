@@ -31,12 +31,7 @@ public class MessageService {
      */
     public SendResponse showSecurityInfo(Long chatId) {
         if (chatId != null && chatId >= 0) {
-            String securityInfo = """
-                    Данные службы охраны для оформления пропуска на машину:
-                    \uD83D\uDCDE 3534522
-                    \uD83D\uDCE7 security@dev.pro
-                    """;
-            sendMessage = new SendMessage(chatId, securityInfo);
+            sendMessage = new SendMessage(chatId, SECURITY_CONTACT_INFO);
             return bot.execute(sendMessage);
         }
         return null;
