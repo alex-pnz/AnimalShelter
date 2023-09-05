@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 
 import java.time.LocalDate;
 
+/**
+ * Класс, описывающий событие "усыновления" животного из приюта
+ */
 @Entity
 @Table(name = "adoptions")
 public class Adoption {

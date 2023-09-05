@@ -16,6 +16,9 @@ import pro.sky.animalshelter.service.MessageService;
 
 import java.util.List;
 
+/**
+ * Основной класс, содержащий цикл обработки сообщений
+ */
 @Service
 public class TelegramBotUpdateListener implements UpdatesListener {
     private Logger logger = LoggerFactory.getLogger(TelegramBotUpdateListener.class);
@@ -85,6 +88,11 @@ public class TelegramBotUpdateListener implements UpdatesListener {
         return UpdatesListener.CONFIRMED_UPDATES_ALL;
     }
 
+    /**
+     * функция обработки событий, для которых не реализованы специфические
+     * обработчики
+     * @param update
+     */
     private void defaultHandler(Update update) {
         SendMessage message = new SendMessage(update.message().chat().id(),
                 "This command is not yet supported");
