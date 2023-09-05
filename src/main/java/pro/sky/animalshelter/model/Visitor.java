@@ -2,6 +2,9 @@ package pro.sky.animalshelter.model;
 
 import jakarta.persistence.*;
 
+/**
+ * Класс, описывающий посетителя приюта
+ */
 @Entity
 @Table(name = "visitors")
 public class Visitor {

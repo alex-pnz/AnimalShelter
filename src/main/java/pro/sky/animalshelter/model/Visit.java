@@ -4,6 +4,10 @@ import jakarta.persistence.*;
 
 import java.time.LocalDate;
 
+/**
+ * Класс, описывающий событие посещения приюта возможным
+ * "усыновителем" какого-либо животного
+ */
 @Entity
 @Table(name = "visitors_per_shelter")
 public class Visit {

@@ -5,6 +5,9 @@ import jakarta.persistence.*;
 import java.time.LocalTime;
 import java.util.List;
 
+/**
+ * Класс, описывающий приют
+ */
 @Entity
 @Table(name = "shelters")
 public class Shelter {

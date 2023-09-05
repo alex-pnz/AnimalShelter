@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 
 import java.time.LocalDate;
 
+/**
+ * Класс, описывающий животное в приюте
+ */
 @Entity
 @Table(name="animals")
 public class Animal {
