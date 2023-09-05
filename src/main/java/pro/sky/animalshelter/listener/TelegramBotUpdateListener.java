@@ -59,7 +59,7 @@ public class TelegramBotUpdateListener implements UpdatesListener {
                         messageService.showSecurityInfo(chatId);
                     }
                     case "/safety" -> {
-                        //
+                        messageService.showSafetyMeasures(chatId);
                     }
                     default -> {
                         defaultHandler(update);

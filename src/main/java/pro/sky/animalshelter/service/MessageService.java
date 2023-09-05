@@ -78,5 +78,16 @@ public class MessageService {
         return visit.getShelter().getShelterType();
     }
 
+    public SendResponse showSafetyMeasures(Long chatId) {
+        AnimalType shelterType = getShelterType(chatId);
+        if (shelterType == AnimalType.CAT) {
+            sendMessage = new SendMessage(chatId, CAT_SHELTER_SAFETY);
+            return bot.execute(sendMessage);
+        } else if (shelterType == AnimalType.DOG) {
+            sendMessage = new SendMessage(chatId, DOG_SHELTER_SAFETY);
+            return bot.execute(sendMessage);
+        }
+        return null;
+    }
 
 }
