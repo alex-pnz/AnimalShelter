@@ -10,9 +10,9 @@ public class Visitor {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String firstName;
+    private Long chatId;
 
-    private String lastName;
+    private String Name;
 
     private String phoneNumber;
 
