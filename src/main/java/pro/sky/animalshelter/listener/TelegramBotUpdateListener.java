@@ -53,7 +53,7 @@ public class TelegramBotUpdateListener implements UpdatesListener {
                         messageService.showInfoAboutShelter(chatId);
                     }
                     case "/schedule" -> {
-                        //
+                        messageService.showShelterSchedule(chatId);
                     }
                     case "/security" -> {
                         messageService.showSecurityInfo(chatId);
