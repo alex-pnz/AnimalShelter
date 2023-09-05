@@ -47,7 +47,7 @@ public class TelegramBotUpdateListener implements UpdatesListener {
                         menuService.showMainMenu(chatId);
                     }
                     case "/about" -> {
-                        //
+                        messageService.showInfoAboutShelter(chatId);
                     }
                     case "/schedule" -> {
                         //
@@ -71,7 +71,7 @@ public class TelegramBotUpdateListener implements UpdatesListener {
                         message = new SendMessage(update.callbackQuery().message().chat().id(), "Test: Попадаем в раздел кошки"); // Для тестирования, потом заменить
                     }
                     case "dog" -> {
-                        message = new SendMessage(update.callbackQuery().message().chat().id(),"Test: Попадаем в раздел собаки");//Для тестирования, потом заменить
+                        message = new SendMessage(update.callbackQuery().message().chat().id(), "Test: Попадаем в раздел собаки");//Для тестирования, потом заменить
                     }
                     default -> {
                         defaultHandler(update);

@@ -5,12 +5,23 @@ import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.response.SendResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import pro.sky.animalshelter.model.AnimalType;
+import pro.sky.animalshelter.model.Visit;
+import pro.sky.animalshelter.model.Visitor;
+import pro.sky.animalshelter.repository.VisitRepository;
+import pro.sky.animalshelter.repository.VisitorRepository;
+
+import static pro.sky.animalshelter.utils.Constants.*;
 
 @Service
 public class MessageService {
 
     @Autowired
     private TelegramBot bot;
+    @Autowired
+    private VisitorRepository visitorRepository;
+    @Autowired
+    private VisitRepository visitRepository;
     private SendMessage sendMessage = null;
 
     /**
@@ -30,5 +41,31 @@ public class MessageService {
         }
         return null;
     }
+    /**
+     * Выводит информацию о выбранном ранее приюте
+     * @param chatId указать номер чата, в который бот отправит сообщение
+     */
+    public SendResponse showInfoAboutShelter(Long chatId) {
+        AnimalType shelterType = getShelterType(chatId);
+        if(shelterType == AnimalType.CAT){
+            sendMessage = new SendMessage(chatId, CAT_SHELTER_DESCRIPTION);
+            return bot.execute(sendMessage);
+        } else if (shelterType == AnimalType.DOG) {
+            sendMessage = new SendMessage(chatId, DOG_SHELTER_DESCRIPTION);
+            return bot.execute(sendMessage);
+        }
+        return null;
+    }
+    /**
+     * Метод возвращающий тип приюта по chatId
+     * @param chatId
+     * @return AnimalType
+     */
+    private AnimalType getShelterType(Long chatId) {
+        Visitor visitor = visitorRepository.findByChatId(chatId);
+        Visit visit = visitRepository.findByVisitor(visitor);
+        return visit.getShelter().getShelterType();
+    }
+
 
 }
