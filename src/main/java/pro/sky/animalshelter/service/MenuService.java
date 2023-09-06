@@ -11,9 +11,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class MenuService {
 
-    @Autowired
-    private TelegramBot bot;
-    private SendMessage sendMessage = null;
+    private final TelegramBot bot;
+
+    public MenuService(TelegramBot bot) {
+        this.bot = bot;
+    }
 
     /**
      * Выводит главное меню (Кошки/Собаки) по команде /start
@@ -22,7 +24,7 @@ public class MenuService {
      */
     public SendResponse showMainMenu(Long chatId) {
         if (chatId != null && chatId >= 0) {
-            sendMessage = new SendMessage(chatId,"Правет Друг! Выбери приют:");
+            SendMessage sendMessage = new SendMessage(chatId,"Правет Друг! Выбери приют:");
 
             InlineKeyboardButton[][] inlineKeyboardButtons = {{new InlineKeyboardButton("\uD83D\uDC08 Кошки").callbackData("cat"),
                     new InlineKeyboardButton(

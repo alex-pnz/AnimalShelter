@@ -62,4 +62,13 @@ public class Constants {
             2. Для угощения кошек можно приносить только специальные кошачие лакомства.
             Ничего соленого, сладкого, жирного, никаких рыбных костей!
             """;
+
+
+    public final static String COMMAND_START = "/start";
+    public final static String COMMAND_ABOUT = "/about";
+    public final static String COMMAND_SCHEDULE = "/schedule";
+    public final static String COMMAND_SECURITY = "/security";
+    public final static String COMMAND_SAFETY = "/safety";
+    public final static String CALLBACK_MENU_CAT = "cat";
+    public final static String CALLBACK_MENU_DOG = "dog";
 }
