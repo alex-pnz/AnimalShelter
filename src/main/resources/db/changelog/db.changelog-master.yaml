@@ -5,3 +5,5 @@ databaseChangeLog:
       file: classpath:db/changelog/changes/002-modify-visitor.sql
   - include:
       file: classpath:db/changelog/changes/003-modify-column-type-visitor.sql
+  - include:
+      file: classpath:db/changelog/changes/004-modify-animal-type-columns.sql

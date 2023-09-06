@@ -16,6 +16,7 @@ public class Shelter {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Enumerated(EnumType.STRING)
     private AnimalType shelterType;
 
     private String shelterName;
