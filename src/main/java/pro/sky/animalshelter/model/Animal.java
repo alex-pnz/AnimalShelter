@@ -15,6 +15,7 @@ public class Animal {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Enumerated(EnumType.STRING)
     private AnimalType animalType;
 
     private String name;
