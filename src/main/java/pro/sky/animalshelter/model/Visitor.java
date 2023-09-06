@@ -15,7 +15,7 @@ public class Visitor {
 
     private Long chatId;
 
-    private String Name;
+    private String name;
 
     private String phoneNumber;
 

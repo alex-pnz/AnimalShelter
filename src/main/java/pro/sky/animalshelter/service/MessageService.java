@@ -20,15 +20,17 @@ import static pro.sky.animalshelter.utils.Constants.*;
 @Service
 public class MessageService {
 
-    @Autowired
-    private TelegramBot bot;
-    @Autowired
-    private VisitorRepository visitorRepository;
-    @Autowired
-    private VisitRepository visitRepository;
-    @Autowired
-    private ShelterRepository shelterRepository;
-    private SendMessage sendMessage = null;
+    private final TelegramBot bot;
+    private final VisitorRepository visitorRepository;
+    private final VisitRepository visitRepository;
+    private final ShelterRepository shelterRepository;
+
+    public MessageService(TelegramBot bot, VisitorRepository visitorRepository, VisitRepository visitRepository, ShelterRepository shelterRepository) {
+        this.bot = bot;
+        this.visitorRepository = visitorRepository;
+        this.visitRepository = visitRepository;
+        this.shelterRepository = shelterRepository;
+    }
 
     /**
      * Выводит данные службы охраны для оформления пропуска на машину
@@ -37,7 +39,7 @@ public class MessageService {
      */
     public SendResponse showSecurityInfo(Long chatId) {
         if (chatId != null && chatId >= 0) {
-            sendMessage = new SendMessage(chatId, SECURITY_CONTACT_INFO);
+            SendMessage sendMessage = new SendMessage(chatId, SECURITY_CONTACT_INFO);
             return bot.execute(sendMessage);
         }
         return null;
@@ -47,6 +49,7 @@ public class MessageService {
      * @param chatId указать номер чата, в который бот отправит сообщение
      */
     public SendResponse showInfoAboutShelter(Long chatId) {
+        SendMessage sendMessage;
         AnimalType shelterType = getShelterType(chatId);
         if(shelterType == AnimalType.CAT){
             sendMessage = new SendMessage(chatId, CAT_SHELTER_DESCRIPTION);
@@ -63,7 +66,7 @@ public class MessageService {
      * @param chatId указать номер чата, в который бот отправит сообщение
      */
     public SendResponse showShelterSchedule(Long chatId) {
-        sendMessage = new SendMessage(chatId, SHELTER_SCHEDULE);
+        SendMessage sendMessage = new SendMessage(chatId, SHELTER_SCHEDULE);
 
         return null;
     }
@@ -80,6 +83,7 @@ public class MessageService {
     }
 
     public SendResponse showSafetyMeasures(Long chatId) {
+        SendMessage sendMessage;
         AnimalType shelterType = getShelterType(chatId);
         if (shelterType == AnimalType.CAT) {
             sendMessage = new SendMessage(chatId, CAT_SHELTER_SAFETY);

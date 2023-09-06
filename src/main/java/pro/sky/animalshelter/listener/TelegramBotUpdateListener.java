@@ -16,21 +16,24 @@ import pro.sky.animalshelter.service.MessageService;
 
 import java.util.List;
 
+import static pro.sky.animalshelter.utils.Constants.*;
+
 /**
  * Основной класс, содержащий цикл обработки сообщений
  */
 @Service
 public class TelegramBotUpdateListener implements UpdatesListener {
-    private Logger logger = LoggerFactory.getLogger(TelegramBotUpdateListener.class);
+    private final Logger logger = LoggerFactory.getLogger(TelegramBotUpdateListener.class);
 
-    @Autowired
-    private TelegramBot bot;
+    private final TelegramBot bot;
+    private final MenuService menuService;
+    private final MessageService messageService;
 
-    @Autowired
-    private MenuService menuService;
-
-    @Autowired
-    private MessageService messageService;
+    public TelegramBotUpdateListener(TelegramBot bot, MenuService menuService, MessageService messageService) {
+        this.bot = bot;
+        this.menuService = menuService;
+        this.messageService = messageService;
+    }
 
     @PostConstruct
     public void init() {
@@ -46,19 +49,19 @@ public class TelegramBotUpdateListener implements UpdatesListener {
                 Long chatId = update.message().chat().id();
                 String command = update.message().text();
                 switch (command) {
-                    case "/start" -> {
+                    case COMMAND_START -> {
                         menuService.showMainMenu(chatId);
                     }
-                    case "/about" -> {
+                    case COMMAND_ABOUT -> {
                         messageService.showInfoAboutShelter(chatId);
                     }
-                    case "/schedule" -> {
+                    case COMMAND_SCHEDULE -> {
                         messageService.showShelterSchedule(chatId);
                     }
-                    case "/security" -> {
+                    case COMMAND_SECURITY -> {
                         messageService.showSecurityInfo(chatId);
                     }
-                    case "/safety" -> {
+                    case COMMAND_SAFETY -> {
                         messageService.showSafetyMeasures(chatId);
                     }
                     default -> {
@@ -70,10 +73,10 @@ public class TelegramBotUpdateListener implements UpdatesListener {
                 String callback = callbackQuery.data();
                 SendMessage message = null;
                 switch (callback) {
-                    case "cat" -> {
+                    case CALLBACK_MENU_CAT -> {
                         message = new SendMessage(update.callbackQuery().message().chat().id(), "Test: Попадаем в раздел кошки"); // Для тестирования, потом заменить
                     }
-                    case "dog" -> {
+                    case CALLBACK_MENU_DOG -> {
                         message = new SendMessage(update.callbackQuery().message().chat().id(), "Test: Попадаем в раздел собаки");//Для тестирования, потом заменить
                     }
                     default -> {
