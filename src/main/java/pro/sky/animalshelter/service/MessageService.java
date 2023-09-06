@@ -73,9 +73,10 @@ public class MessageService {
      * @return AnimalType
      */
     private AnimalType getShelterType(Long chatId) {
-        Visitor visitor = visitorRepository.findByChatId(chatId);
-        Visit visit = visitRepository.findByVisitor(visitor);
-        return visit.getShelter().getShelterType();
+//        Visitor visitor = visitorRepository.findByChatId(chatId);
+//        Visit visit = visitRepository.findByVisitor(visitor);
+//        return visit.getShelter().getShelterType();
+        return AnimalType.CAT;
     }
 
     public SendResponse showSafetyMeasures(Long chatId) {
