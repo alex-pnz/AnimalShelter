@@ -11,8 +11,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import pro.sky.animalshelter.model.Shelter;
+import pro.sky.animalshelter.model.Visitor;
 import pro.sky.animalshelter.service.MenuService;
 import pro.sky.animalshelter.service.MessageService;
+import pro.sky.animalshelter.service.VisitorService;
 
 import java.util.List;
 
@@ -28,11 +31,14 @@ public class TelegramBotUpdateListener implements UpdatesListener {
     private final TelegramBot bot;
     private final MenuService menuService;
     private final MessageService messageService;
+    private final VisitorService visitorService;
 
-    public TelegramBotUpdateListener(TelegramBot bot, MenuService menuService, MessageService messageService) {
+    public TelegramBotUpdateListener(TelegramBot bot, MenuService menuService, MessageService messageService,
+                                     VisitorService visitorService) {
         this.bot = bot;
         this.menuService = menuService;
         this.messageService = messageService;
+        this.visitorService = visitorService;
     }
 
     @PostConstruct
@@ -44,6 +50,9 @@ public class TelegramBotUpdateListener implements UpdatesListener {
     public int process(List<Update> updates) {
         updates.forEach(update -> {
             // пишем обработчики в виде функций void functionName(Update update), вызываем здесь
+
+            // создаем нового посетителя, если таковой раньше не заходил
+            Visitor currentVisitor = visitorService.getVisitor(update);
 
             if (update.message() != null) { // Меню InlineKeyboard не передает message, поэтому ловим  callback который передаем в callbackData
                 Long chatId = update.message().chat().id();
