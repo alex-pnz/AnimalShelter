@@ -23,7 +23,7 @@ public class Adoption {
     @JoinColumn(name = "animal_id")
     private Animal animal;
 
-    private LocalDate adpotionDate;
+    private LocalDate adoptionDate;
 
     public Long getId() {
         return id;
@@ -49,11 +49,11 @@ public class Adoption {
         this.animal = animal;
     }
 
-    public LocalDate getAdpotionDate() {
-        return adpotionDate;
+    public LocalDate getAdoptionDate() {
+        return adoptionDate;
     }
 
-    public void setAdpotionDate(LocalDate adpotionDate) {
-        this.adpotionDate = adpotionDate;
+    public void setAdoptionDate(LocalDate adoptionDate) {
+        this.adoptionDate = adoptionDate;
     }
 }
