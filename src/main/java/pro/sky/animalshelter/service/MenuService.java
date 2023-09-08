@@ -3,6 +3,8 @@ package pro.sky.animalshelter.service;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.request.InlineKeyboardButton;
 import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
+import com.pengrad.telegrambot.model.request.KeyboardButton;
+import com.pengrad.telegrambot.model.request.ReplyKeyboardMarkup;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.response.SendResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,9 +13,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class MenuService {
 
-    @Autowired
-    private TelegramBot bot;
-    private SendMessage sendMessage = null;
+    private final TelegramBot bot;
+
+    public MenuService(TelegramBot bot) {
+        this.bot = bot;
+    }
 
     /**
      * Выводит главное меню (Кошки/Собаки) по команде /start
@@ -22,7 +26,7 @@ public class MenuService {
      */
     public SendResponse showMainMenu(Long chatId) {
         if (chatId != null && chatId >= 0) {
-            sendMessage = new SendMessage(chatId,"Правет Друг! Выбери приют:");
+            SendMessage sendMessage = new SendMessage(chatId,"Правет Друг! Выбери приют:");
 
             InlineKeyboardButton[][] inlineKeyboardButtons = {{new InlineKeyboardButton("\uD83D\uDC08 Кошки").callbackData("cat"),
                     new InlineKeyboardButton(
@@ -30,6 +34,28 @@ public class MenuService {
             InlineKeyboardMarkup markupInline = new InlineKeyboardMarkup(inlineKeyboardButtons);
             sendMessage.replyMarkup(markupInline);
             return bot.execute(sendMessage);
+        }
+        return null;
+    }
+
+    /**
+     * Возвращает кнопку "Помощь" которая показывает все команды
+     * @param chatId указать номер чата, в который бот отправит сообщение
+     * @return для облегчения процесса тестирования метода, возвращаем объект класса SendResponse
+     */
+    public ReplyKeyboardMarkup setHelpButton(Long chatId) {
+        if (chatId != null && chatId >= 0) {
+
+            KeyboardButton keyboardButton1 = new KeyboardButton("\uD83D\uDC3E Помощь");
+
+            KeyboardButton[][] buttons = {{keyboardButton1},};
+
+            ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup(buttons);
+
+            replyKeyboardMarkup.resizeKeyboard(true);
+            replyKeyboardMarkup.oneTimeKeyboard(false);
+
+            return replyKeyboardMarkup;
         }
         return null;
     }

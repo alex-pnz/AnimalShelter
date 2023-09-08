@@ -24,7 +24,7 @@ public class Visit {
     @JoinColumn(name = "visitor_id")
     private Visitor visitor;
 
-    private LocalDate visitDate;
+    private LocalDate visitDate = LocalDate.now();
 
     public Long getId() {
         return id;
