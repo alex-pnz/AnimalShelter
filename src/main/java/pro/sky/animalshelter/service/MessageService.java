@@ -24,12 +24,15 @@ public class MessageService {
     private final VisitorRepository visitorRepository;
     private final VisitRepository visitRepository;
     private final ShelterRepository shelterRepository;
+    private final MenuService menuService;
 
-    public MessageService(TelegramBot bot, VisitorRepository visitorRepository, VisitRepository visitRepository, ShelterRepository shelterRepository) {
+    public MessageService(TelegramBot bot, VisitorRepository visitorRepository, VisitRepository visitRepository,
+                          ShelterRepository shelterRepository, MenuService menuService) {
         this.bot = bot;
         this.visitorRepository = visitorRepository;
         this.visitRepository = visitRepository;
         this.shelterRepository = shelterRepository;
+        this.menuService = menuService;
     }
 
     /**
@@ -53,9 +56,11 @@ public class MessageService {
         AnimalType shelterType = getShelterType(chatId);
         if(shelterType == AnimalType.CAT){
             sendMessage = new SendMessage(chatId, CAT_SHELTER_DESCRIPTION);
+            sendMessage.replyMarkup(menuService.setHelpButton(chatId));
             return bot.execute(sendMessage);
         } else if (shelterType == AnimalType.DOG) {
             sendMessage = new SendMessage(chatId, DOG_SHELTER_DESCRIPTION);
+            sendMessage.replyMarkup(menuService.setHelpButton(chatId));
             return bot.execute(sendMessage);
         }
         return null;
@@ -93,6 +98,15 @@ public class MessageService {
             return bot.execute(sendMessage);
         }
         return null;
+    }
+
+    /**
+     * Выводит сообщение со всеми доступными командами
+     * @param chatId указать номер чата, в который бот отправит сообщение
+     */
+    public SendResponse showHelp(Long chatId) {
+        SendMessage sendMessage = new SendMessage(chatId, SHELTER_HELP);
+        return bot.execute(sendMessage);
     }
 
 }

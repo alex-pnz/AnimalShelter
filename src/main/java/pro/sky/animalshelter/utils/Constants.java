@@ -63,12 +63,23 @@ public class Constants {
             Ничего соленого, сладкого, жирного, никаких рыбных костей!
             """;
 
+    public static String SHELTER_HELP = """
+            Список доступных команд:
+            /start - Главное меню
+            /about - Информация о выбранном приюте
+            /schedule - Расписание работы
+            /security - Kонтактные данные охраны для оформления пропуска
+            /safety - Oбщие рекомендации о технике безопасности на территории приюта
+            /volunteer - Если остались вопросы, то можно позвать волонтера
+            """;
 
     public final static String COMMAND_START = "/start";
     public final static String COMMAND_ABOUT = "/about";
     public final static String COMMAND_SCHEDULE = "/schedule";
     public final static String COMMAND_SECURITY = "/security";
     public final static String COMMAND_SAFETY = "/safety";
+    public final static String COMMAND_VOLUNTEER = "/volunteer";
+    public final static String COMMAND_HELP = "\uD83D\uDC3E Помощь";
     public final static String CALLBACK_MENU_CAT = "cat";
     public final static String CALLBACK_MENU_DOG = "dog";
 }
