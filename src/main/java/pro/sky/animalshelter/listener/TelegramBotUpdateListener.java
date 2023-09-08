@@ -73,27 +73,21 @@ public class TelegramBotUpdateListener implements UpdatesListener {
                     case COMMAND_SAFETY -> {
                         messageService.showSafetyMeasures(chatId);
                     }
+                    case COMMAND_VOLUNTEER -> {
+                        ;
+                    }
+                    case COMMAND_HELP -> {
+                        messageService.showHelp(chatId);
+                    }
                     default -> {
                         defaultHandler(update);
                     }
                 }
             } else if (update.callbackQuery() != null) {   // Здесь обрабатываем callback полученный из меню, потом надо добавить другие кейсы из других меню которые сделаем позже
                 CallbackQuery callbackQuery = update.callbackQuery();
-                String callback = callbackQuery.data();
-                SendMessage message = null;
-                switch (callback) {
-                    case CALLBACK_MENU_CAT -> {
-                        message = new SendMessage(update.callbackQuery().message().chat().id(), "Test: Попадаем в раздел кошки"); // Для тестирования, потом заменить
-                    }
-                    case CALLBACK_MENU_DOG -> {
-                        message = new SendMessage(update.callbackQuery().message().chat().id(), "Test: Попадаем в раздел собаки");//Для тестирования, потом заменить
-                    }
-                    default -> {
-                        defaultHandler(update);
-                    }
-                }
+                Long chatId = callbackQuery.from().id();
 
-                bot.execute(message);
+                SendResponse sendResponse = messageService.showInfoAboutShelter(chatId);
             }
 
         });
