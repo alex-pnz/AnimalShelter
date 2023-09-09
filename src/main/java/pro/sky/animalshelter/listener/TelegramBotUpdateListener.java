@@ -33,6 +33,9 @@ public class TelegramBotUpdateListener implements UpdatesListener {
     private final MessageService messageService;
     private final VisitorService visitorService;
 
+    private boolean enteringContactsPhoneNumber = false; // Используется только во время ввода контактных данных
+    private boolean enteringContactsEmail = false; // Используется только во время ввода контактных данных
+
     public TelegramBotUpdateListener(TelegramBot bot, MenuService menuService, MessageService messageService,
                                      VisitorService visitorService) {
         this.bot = bot;
@@ -57,6 +60,22 @@ public class TelegramBotUpdateListener implements UpdatesListener {
             if (update.message() != null) { // Меню InlineKeyboard не передает message, поэтому ловим  callback который передаем в callbackData
                 Long chatId = update.message().chat().id();
                 String command = update.message().text();
+
+                if (command.startsWith("/")){ // Если мы уже выбрали "Записать контактные данные посетителя", но ввели не телефон или почту, а команду -> Следовательно телефон или почту больше не ловим
+                    enteringContactsPhoneNumber = false;
+                    enteringContactsEmail = false;
+                }
+                if(enteringContactsPhoneNumber){ // Если выбрали "Записать контактные данные посетителя" то сначала сохраняем телефон
+                    messageService.saveContactsPhoneNumber(chatId, command);
+                    bot.execute(new SendMessage(chatId,"Ввведите Вашу электронную почту"));
+                    enteringContactsPhoneNumber = false;
+                    return;
+                } else if(enteringContactsEmail){ // сохраняем почту
+                    messageService.saveContactsEmail(chatId, command);
+                    enteringContactsEmail = false;
+                    return;
+                }
+
                 switch (command) {
                     case COMMAND_START -> {
                         menuService.showMainMenu(chatId);
@@ -73,6 +92,11 @@ public class TelegramBotUpdateListener implements UpdatesListener {
                     case COMMAND_SAFETY -> {
                         messageService.showSafetyMeasures(chatId);
                     }
+                    case COMMAND_ADD_CONTACTS -> {
+                        bot.execute(new SendMessage(chatId,"Ввведите Ваш номер телефона"));
+                        enteringContactsPhoneNumber = true;
+                        enteringContactsEmail = true;
+                    }
                     case COMMAND_VOLUNTEER -> {
                         ;
                     }
@@ -87,7 +111,7 @@ public class TelegramBotUpdateListener implements UpdatesListener {
                 CallbackQuery callbackQuery = update.callbackQuery();
                 Long chatId = callbackQuery.from().id();
 
-                SendResponse sendResponse = messageService.showInfoAboutShelter(chatId);
+                messageService.showInfoAboutShelter(chatId);
             }
 
         });
