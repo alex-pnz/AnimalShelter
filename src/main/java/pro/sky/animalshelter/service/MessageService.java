@@ -3,17 +3,12 @@ package pro.sky.animalshelter.service;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.response.SendResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import pro.sky.animalshelter.listener.ChatWithVolunteer;
 import pro.sky.animalshelter.model.AnimalType;
-import pro.sky.animalshelter.model.Shelter;
-import pro.sky.animalshelter.model.Visit;
-import pro.sky.animalshelter.model.Visitor;
 import pro.sky.animalshelter.repository.ShelterRepository;
 import pro.sky.animalshelter.repository.VisitRepository;
 import pro.sky.animalshelter.repository.VisitorRepository;
-
-import java.time.LocalTime;
 
 import static pro.sky.animalshelter.utils.Constants.*;
 
@@ -109,4 +104,21 @@ public class MessageService {
         return bot.execute(sendMessage);
     }
 
+    /**
+     * Запускает поиск волонтера и информирует об этом пользователя
+     * @param chatId указать номер чата, в который бот отправит сообщение
+     */
+    public SendResponse showFindVolunteerInfo(Long chatId) {
+        SendMessage sendMessage = new SendMessage(chatId, "Идет поиск волонтера");
+        return bot.execute(sendMessage);
+    }
+    /**
+     * Отправляет сообщение в указанный чат
+     * @param chatId указать номер чата, в который бот отправит сообщение
+     * @param message сообщение, которое будет отправлено
+     */
+    public SendResponse sendMessage(Long chatId, String message) {
+        SendMessage sendMessage = new SendMessage(chatId, message);
+        return bot.execute(sendMessage);
+    }
 }
