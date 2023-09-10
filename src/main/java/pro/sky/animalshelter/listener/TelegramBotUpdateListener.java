@@ -9,7 +9,9 @@ import com.pengrad.telegrambot.response.SendResponse;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import pro.sky.animalshelter.model.Shelter;
 import pro.sky.animalshelter.model.Visitor;
 import pro.sky.animalshelter.service.MenuService;
 import pro.sky.animalshelter.service.MessageService;
@@ -31,6 +33,9 @@ public class TelegramBotUpdateListener implements UpdatesListener {
     private final MessageService messageService;
     private final VisitorService visitorService;
     private final ChatWithVolunteer chat;
+
+    private boolean enteringContactsPhoneNumber = false; // Используется только во время ввода контактных данных
+    private boolean enteringContactsEmail = false; // Используется только во время ввода контактных данных
 
     public TelegramBotUpdateListener(TelegramBot bot, MenuService menuService, MessageService messageService,
                                      VisitorService visitorService, ChatWithVolunteer chat) {
@@ -57,6 +62,20 @@ public class TelegramBotUpdateListener implements UpdatesListener {
             if (update.message() != null) { // Меню InlineKeyboard не передает message, поэтому ловим  callback который передаем в callbackData
                 Long chatId = update.message().chat().id();
                 String text = update.message().text();
+                if (text.startsWith("/")){ // Если мы уже выбрали "Записать контактные данные посетителя", но ввели не телефон или почту, а команду -> Следовательно телефон или почту больше не ловим
+                    enteringContactsPhoneNumber = false;
+                    enteringContactsEmail = false;
+                }
+                if(enteringContactsPhoneNumber){ // Если выбрали "Записать контактные данные посетителя" то сначала сохраняем телефон
+                    messageService.saveContactsPhoneNumber(chatId, text);
+                    bot.execute(new SendMessage(chatId,"Ввведите Вашу электронную почту"));
+                    enteringContactsPhoneNumber = false;
+                    return;
+                } else if(enteringContactsEmail){ // сохраняем почту
+                    messageService.saveContactsEmail(chatId, text);
+                    enteringContactsEmail = false;
+                    return;
+                }
                 if (text.startsWith("/")) {
                     switch (text) {
                         case COMMAND_START -> {
@@ -73,6 +92,11 @@ public class TelegramBotUpdateListener implements UpdatesListener {
                         }
                         case COMMAND_SAFETY -> {
                             messageService.showSafetyMeasures(chatId);
+                        }
+                        case COMMAND_ADD_CONTACTS -> {
+                            bot.execute(new SendMessage(chatId,"Ввведите Ваш номер телефона"));
+                            enteringContactsPhoneNumber = true;
+                            enteringContactsEmail = true;
                         }
                         case COMMAND_VOLUNTEER -> {
                             messageService.showFindVolunteerInfo(chatId);
@@ -98,7 +122,7 @@ public class TelegramBotUpdateListener implements UpdatesListener {
                 CallbackQuery callbackQuery = update.callbackQuery();
                 Long chatId = callbackQuery.from().id();
 
-                SendResponse sendResponse = messageService.showInfoAboutShelter(chatId);
+                messageService.showInfoAboutShelter(chatId);
             }
 
         });

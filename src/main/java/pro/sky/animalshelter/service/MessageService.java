@@ -3,12 +3,18 @@ package pro.sky.animalshelter.service;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.response.SendResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pro.sky.animalshelter.listener.ChatWithVolunteer;
 import pro.sky.animalshelter.model.AnimalType;
+import pro.sky.animalshelter.model.Shelter;
+import pro.sky.animalshelter.model.Visit;
+import pro.sky.animalshelter.model.Visitor;
 import pro.sky.animalshelter.repository.ShelterRepository;
 import pro.sky.animalshelter.repository.VisitRepository;
 import pro.sky.animalshelter.repository.VisitorRepository;
+
+import java.time.LocalTime;
 
 import static pro.sky.animalshelter.utils.Constants.*;
 
@@ -68,7 +74,7 @@ public class MessageService {
     public SendResponse showShelterSchedule(Long chatId) {
         SendMessage sendMessage = new SendMessage(chatId, SHELTER_SCHEDULE);
 
-        return null;
+        return bot.execute(sendMessage);
     }
     /**
      * Метод возвращающий тип приюта по chatId
@@ -102,6 +108,46 @@ public class MessageService {
     public SendResponse showHelp(Long chatId) {
         SendMessage sendMessage = new SendMessage(chatId, SHELTER_HELP);
         return bot.execute(sendMessage);
+    }
+
+    /**
+     * Проверяет поступающий в message номер телефона с помощью регулярного выражения
+     * и сохраняет его в базу данных
+     * @param chatId указать номер чата, в который бот отправит сообщение
+     * @param message передает номер телефона для обработки
+     */
+    public SendResponse saveContactsPhoneNumber(Long chatId, String message){
+        message = message.replaceAll(" |\\(|\\)|\\+","");
+
+        if (message.matches("[0-9]{11}") && message.matches("^[78].+")){
+            if(message.startsWith("8")) message = message.replaceFirst("8","7");
+            Visitor visitor = visitorRepository.findByChatId(chatId);
+            visitor.setPhoneNumber("+" + message);
+            visitorRepository.save(visitor);
+            return bot.execute(new SendMessage(chatId, "Номер " + visitor.getPhoneNumber() + " сохранен!"));
+        }
+
+        return bot.execute(new SendMessage(chatId, "К сожалению бот не смог распознать номер телефона. " +
+                "(/add_contacts - попробовать ввести еще раз)"));
+    }
+
+    /**
+     * Проверяет поступающий в message адрес электронной почты с помощью регулярного выражения
+     * и сохраняет его в базу данных
+     * @param chatId указать номер чата, в который бот отправит сообщение
+     * @param message передает адрес электронной почты для обработки
+     */
+    public SendResponse saveContactsEmail(Long chatId, String message){
+        message = message.trim();
+
+        if (message.matches("[\\w-.]+@[\\w-]+\\.[a-z0-9]+")){
+            Visitor visitor = visitorRepository.findByChatId(chatId);
+            visitor.setEmail(message);
+            visitorRepository.save(visitor);
+            return bot.execute(new SendMessage(chatId, "Электронная почта " + visitor.getEmail() + " сохранена!"));
+        }
+        return bot.execute(new SendMessage(chatId, "К сожалению бот не смог распознать адрес электронной почты. " +
+                "(/add_contacts - попробовать ввести еще раз)"));
     }
 
     /**
