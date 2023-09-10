@@ -53,7 +53,7 @@ public class MenuService {
             ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup(buttons);
 
             replyKeyboardMarkup.resizeKeyboard(true);
-            replyKeyboardMarkup.oneTimeKeyboard(false);
+//            replyKeyboardMarkup.oneTimeKeyboard(false);
 
             return replyKeyboardMarkup;
         }

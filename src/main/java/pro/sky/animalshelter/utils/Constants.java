@@ -70,6 +70,7 @@ public class Constants {
             /schedule - Расписание работы
             /security - Kонтактные данные охраны для оформления пропуска
             /safety - Oбщие рекомендации о технике безопасности на территории приюта
+            /add_contacts - Записать контактные данные посетителя для связи
             /volunteer - Если остались вопросы, то можно позвать волонтера
             """;
 
@@ -78,6 +79,7 @@ public class Constants {
     public final static String COMMAND_SCHEDULE = "/schedule";
     public final static String COMMAND_SECURITY = "/security";
     public final static String COMMAND_SAFETY = "/safety";
+    public final static String COMMAND_ADD_CONTACTS = "/add_contacts";
     public final static String COMMAND_VOLUNTEER = "/volunteer";
     public final static String COMMAND_HELP = "\uD83D\uDC3E Помощь";
     public final static String CALLBACK_MENU_CAT = "cat";
