@@ -5,6 +5,7 @@ import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.response.SendResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import pro.sky.animalshelter.listener.ChatWithVolunteer;
 import pro.sky.animalshelter.model.AnimalType;
 import pro.sky.animalshelter.model.Shelter;
 import pro.sky.animalshelter.model.Visit;
@@ -149,4 +150,21 @@ public class MessageService {
                 "(/add_contacts - попробовать ввести еще раз)"));
     }
 
+    /**
+     * Запускает поиск волонтера и информирует об этом пользователя
+     * @param chatId указать номер чата, в который бот отправит сообщение
+     */
+    public SendResponse showFindVolunteerInfo(Long chatId) {
+        SendMessage sendMessage = new SendMessage(chatId, "Идет поиск волонтера");
+        return bot.execute(sendMessage);
+    }
+    /**
+     * Отправляет сообщение в указанный чат
+     * @param chatId указать номер чата, в который бот отправит сообщение
+     * @param message сообщение, которое будет отправлено
+     */
+    public SendResponse sendMessage(Long chatId, String message) {
+        SendMessage sendMessage = new SendMessage(chatId, message);
+        return bot.execute(sendMessage);
+    }
 }

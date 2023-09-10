@@ -81,6 +81,7 @@ public class Constants {
     public final static String COMMAND_SAFETY = "/safety";
     public final static String COMMAND_ADD_CONTACTS = "/add_contacts";
     public final static String COMMAND_VOLUNTEER = "/volunteer";
+    public final static String COMMAND_STOP_CHAT = "/stopChat";
     public final static String COMMAND_HELP = "\uD83D\uDC3E Помощь";
     public final static String CALLBACK_MENU_CAT = "cat";
     public final static String CALLBACK_MENU_DOG = "dog";

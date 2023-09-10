@@ -32,16 +32,18 @@ public class TelegramBotUpdateListener implements UpdatesListener {
     private final MenuService menuService;
     private final MessageService messageService;
     private final VisitorService visitorService;
+    private final ChatWithVolunteer chat;
 
     private boolean enteringContactsPhoneNumber = false; // Используется только во время ввода контактных данных
     private boolean enteringContactsEmail = false; // Используется только во время ввода контактных данных
 
     public TelegramBotUpdateListener(TelegramBot bot, MenuService menuService, MessageService messageService,
-                                     VisitorService visitorService) {
+                                     VisitorService visitorService, ChatWithVolunteer chat) {
         this.bot = bot;
         this.menuService = menuService;
         this.messageService = messageService;
         this.visitorService = visitorService;
+        this.chat = chat;
     }
 
     @PostConstruct
@@ -59,53 +61,62 @@ public class TelegramBotUpdateListener implements UpdatesListener {
 
             if (update.message() != null) { // Меню InlineKeyboard не передает message, поэтому ловим  callback который передаем в callbackData
                 Long chatId = update.message().chat().id();
-                String command = update.message().text();
-
-                if (command.startsWith("/")){ // Если мы уже выбрали "Записать контактные данные посетителя", но ввели не телефон или почту, а команду -> Следовательно телефон или почту больше не ловим
+                String text = update.message().text();
+                if (text.startsWith("/")){ // Если мы уже выбрали "Записать контактные данные посетителя", но ввели не телефон или почту, а команду -> Следовательно телефон или почту больше не ловим
                     enteringContactsPhoneNumber = false;
                     enteringContactsEmail = false;
                 }
                 if(enteringContactsPhoneNumber){ // Если выбрали "Записать контактные данные посетителя" то сначала сохраняем телефон
-                    messageService.saveContactsPhoneNumber(chatId, command);
+                    messageService.saveContactsPhoneNumber(chatId, text);
                     bot.execute(new SendMessage(chatId,"Ввведите Вашу электронную почту"));
                     enteringContactsPhoneNumber = false;
                     return;
                 } else if(enteringContactsEmail){ // сохраняем почту
-                    messageService.saveContactsEmail(chatId, command);
+                    messageService.saveContactsEmail(chatId, text);
                     enteringContactsEmail = false;
                     return;
                 }
-
-                switch (command) {
-                    case COMMAND_START -> {
-                        menuService.showMainMenu(chatId);
+                if (text.startsWith("/")) {
+                    switch (text) {
+                        case COMMAND_START -> {
+                            menuService.showMainMenu(chatId);
+                        }
+                        case COMMAND_ABOUT -> {
+                            messageService.showInfoAboutShelter(chatId);
+                        }
+                        case COMMAND_SCHEDULE -> {
+                            messageService.showShelterSchedule(chatId);
+                        }
+                        case COMMAND_SECURITY -> {
+                            messageService.showSecurityInfo(chatId);
+                        }
+                        case COMMAND_SAFETY -> {
+                            messageService.showSafetyMeasures(chatId);
+                        }
+                        case COMMAND_ADD_CONTACTS -> {
+                            bot.execute(new SendMessage(chatId,"Ввведите Ваш номер телефона"));
+                            enteringContactsPhoneNumber = true;
+                            enteringContactsEmail = true;
+                        }
+                        case COMMAND_VOLUNTEER -> {
+                            messageService.showFindVolunteerInfo(chatId);
+                            chat.findVolunteer(chatId);
+                        }
+                        case COMMAND_HELP -> {
+                            messageService.showHelp(chatId);
+                        }
+                        case COMMAND_STOP_CHAT -> {
+                            chat.stopChat(chatId);
+                        }
+                        default -> {
+                            defaultHandler(update);
+                        }
                     }
-                    case COMMAND_ABOUT -> {
-                        messageService.showInfoAboutShelter(chatId);
-                    }
-                    case COMMAND_SCHEDULE -> {
-                        messageService.showShelterSchedule(chatId);
-                    }
-                    case COMMAND_SECURITY -> {
-                        messageService.showSecurityInfo(chatId);
-                    }
-                    case COMMAND_SAFETY -> {
-                        messageService.showSafetyMeasures(chatId);
-                    }
-                    case COMMAND_ADD_CONTACTS -> {
-                        bot.execute(new SendMessage(chatId,"Ввведите Ваш номер телефона"));
-                        enteringContactsPhoneNumber = true;
-                        enteringContactsEmail = true;
-                    }
-                    case COMMAND_VOLUNTEER -> {
-                        ;
-                    }
-                    case COMMAND_HELP -> {
-                        messageService.showHelp(chatId);
-                    }
-                    default -> {
-                        defaultHandler(update);
-                    }
+                    //проверка находится ли пользователь в чате с волонтером
+                } else if (chat.checkVisitor(chatId)) {
+                    chat.continueChat(chatId, null, text);
+                } else if (chat.checkVolunteer(chatId)) {
+                    chat.continueChat(null, chatId, text);
                 }
             } else if (update.callbackQuery() != null) {   // Здесь обрабатываем callback полученный из меню, потом надо добавить другие кейсы из других меню которые сделаем позже
                 CallbackQuery callbackQuery = update.callbackQuery();
@@ -121,6 +132,7 @@ public class TelegramBotUpdateListener implements UpdatesListener {
     /**
      * функция обработки событий, для которых не реализованы специфические
      * обработчики
+     *
      * @param update
      */
     private void defaultHandler(Update update) {

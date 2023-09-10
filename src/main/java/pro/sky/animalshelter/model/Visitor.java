@@ -21,6 +21,10 @@ public class Visitor {
 
     private String email;
 
+    @OneToOne
+    @JoinColumn(name = "volunteer_id")
+    private Volunteer volunteer;
+
     public Visitor() {}
 
     public Visitor(Long chatId, String name, String phoneNumber, String email) {
@@ -68,5 +72,12 @@ public class Visitor {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+    public Volunteer getVolunteer() {
+        return volunteer;
+    }
+
+    public void setVolunteer(Volunteer volunteer) {
+        this.volunteer = volunteer;
     }
 }
