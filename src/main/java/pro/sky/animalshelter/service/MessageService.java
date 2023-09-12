@@ -37,6 +37,7 @@ public class MessageService {
 
     /**
      * Выводит данные службы охраны для оформления пропуска на машину
+     *
      * @param chatId указать номер чата, в который бот отправит сообщение
      * @return для облегчения процесса тестирования метода, возвращаем объект класса SendResponse
      */
@@ -47,14 +48,16 @@ public class MessageService {
         }
         return null;
     }
+
     /**
      * Выводит информацию о выбранном ранее приюте
+     *
      * @param chatId указать номер чата, в который бот отправит сообщение
      */
     public SendResponse showInfoAboutShelter(Long chatId) {
         SendMessage sendMessage;
         AnimalType shelterType = getShelterType(chatId);
-        if(shelterType == AnimalType.CAT){
+        if (shelterType == AnimalType.CAT) {
             sendMessage = new SendMessage(chatId, CAT_SHELTER_DESCRIPTION);
             sendMessage.replyMarkup(menuService.setHelpButton(chatId));
             return bot.execute(sendMessage);
@@ -65,6 +68,7 @@ public class MessageService {
         }
         return null;
     }
+
     /**
      * Выводит информацию о расписании в выбранном приюте
      *
@@ -75,8 +79,10 @@ public class MessageService {
 
         return null;
     }
+
     /**
      * Метод возвращающий тип приюта по chatId
+     *
      * @param chatId
      * @return AnimalType
      */
@@ -102,6 +108,7 @@ public class MessageService {
 
     /**
      * Выводит сообщение со всеми доступными командами
+     *
      * @param chatId указать номер чата, в который бот отправит сообщение
      */
     public SendResponse showHelp(Long chatId) {
@@ -109,4 +116,70 @@ public class MessageService {
         return bot.execute(sendMessage);
     }
 
+    /**
+     * Выводит информацию о правилах знакомства с животным
+     *
+     * @param chatId указать номер чата, в который бот отправит сообщение
+     */
+    public SendResponse showPetHelloRules(Long chatId) {
+        SendMessage sendMessage = new SendMessage(chatId, PET_HELLO);
+
+        return null;
+    }
+    /**
+     * Выводит информацию о правилах перевозки животных
+     *
+     * @param chatId указать номер чата, в который бот отправит сообщение
+     */
+    public SendResponse showPetTransportRules(Long chatId) {
+        SendMessage sendMessage = new SendMessage(chatId, PET_TRANSPORT);
+
+        return null;
+    }
+    /**
+     * Выводит информацию о причинах отказа в усыновлении
+     *
+     * @param chatId указать номер чата, в который бот отправит сообщение
+     */
+    public SendResponse showRefusePolicy(Long chatId) {
+        SendMessage sendMessage = new SendMessage(chatId, REFUSE_POLICY);
+
+        return null;
+    }
+
+    /**
+     * Выводит советы кинолога для собак
+     *
+     * @param chatId указать номер чата, в который бот отправит сообщение
+     */
+    public SendResponse showDogWhispererInfo(Long chatId) {
+        SendMessage sendMessage;
+        AnimalType shelterType = getShelterType(chatId);
+        if (shelterType == AnimalType.CAT) {
+            sendMessage = new SendMessage(chatId, PET_HELLO);
+            return bot.execute(sendMessage);
+        } else if (shelterType == AnimalType.DOG) {
+            sendMessage = new SendMessage(chatId, HOW_TO_HELLO_DOG);
+            sendMessage.replyMarkup(menuService.setHelpButton(chatId));
+            return bot.execute(sendMessage);
+        }
+        return null;
+    }
+    /**
+     * Выводит контакт проверенного кинолога для собак
+     *
+     * @param chatId указать номер чата, в который бот отправит сообщение
+     */
+    public SendResponse showBestKinologInfo(Long chatId) {
+        SendMessage sendMessage;
+        AnimalType shelterType = getShelterType(chatId);
+        if (shelterType == AnimalType.CAT) {
+            return null;
+        } else if (shelterType == AnimalType.DOG) {
+            sendMessage = new SendMessage(chatId, KINOLOG_INFO);
+            sendMessage.replyMarkup(menuService.setHelpButton(chatId));
+            return bot.execute(sendMessage);
+        }
+        return null;
+    }
 }
