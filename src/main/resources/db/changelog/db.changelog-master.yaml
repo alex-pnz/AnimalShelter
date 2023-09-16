@@ -11,3 +11,5 @@ databaseChangeLog:
       file: classpath:db/changelog/changes/005-adding-initial-shelters.sql
   - include:
       file: classpath:db/changelog/changes/006-add-volunteer-table.sql
+  - include:
+      file: classpath:db/changelog/changes/007-updating-values-in-shelter.sql
