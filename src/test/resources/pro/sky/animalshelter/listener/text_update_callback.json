@@ -1,0 +1,8 @@
+{
+  "callback_query": {
+    "from": {
+      "id": 123
+    },
+    "data": "%text%"
+  }
+}

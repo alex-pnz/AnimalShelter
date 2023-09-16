@@ -1,6 +1,7 @@
 package pro.sky.animalshelter.service;
 
 import com.pengrad.telegrambot.TelegramBot;
+import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.response.SendResponse;
 import org.slf4j.Logger;
@@ -17,6 +18,8 @@ import pro.sky.animalshelter.repository.VisitRepository;
 import pro.sky.animalshelter.repository.VisitorRepository;
 
 import java.time.LocalTime;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static pro.sky.animalshelter.utils.Constants.*;
 
@@ -121,6 +124,21 @@ public class MessageService {
      * @param message передает номер телефона для обработки
      */
     public SendResponse saveContactsPhoneNumber(Long chatId, String message){
+
+        Pattern pattern = Pattern.compile(".* ([\\w-.]+@[\\w-]+\\.[a-z0-9]+).*");
+        Matcher matcher = pattern.matcher(message);
+        String email = null;
+
+        if (matcher.find()) {
+            email = matcher.group(1);
+        } else {
+            return bot.execute(new SendMessage(chatId, "К сожалению бот не смог распознать эл почту'. " +
+                    "(/add_contacts - попробовать ввести еще раз)"));
+        }
+
+        saveContactsEmail(chatId, email);
+        message = message.replace(email, "");
+
         message = message.replaceAll(" |\\(|\\)|\\+","");
 
         if (message.matches("[0-9]{11}") && message.matches("^[78].+")){
@@ -170,5 +188,18 @@ public class MessageService {
     public SendResponse sendMessage(Long chatId, String message) {
         SendMessage sendMessage = new SendMessage(chatId, message);
         return bot.execute(sendMessage);
+    }
+
+    /**
+     * функция обработки событий, для которых не реализованы специфические
+     * обработчики
+     *
+     * @param update
+     */
+    public void defaultHandler(Update update) {
+        SendMessage message = new SendMessage((update.message() != null)?
+                update.message().chat().id():update.callbackQuery().from().id(),
+                "This command is not yet supported");
+        SendResponse response = bot.execute(message);
     }
 }
