@@ -48,7 +48,7 @@ public class MenuService {
 
             KeyboardButton keyboardButton1 = new KeyboardButton("\uD83D\uDC3E Помощь");
 
-            KeyboardButton[][] buttons = {{keyboardButton1},};
+            KeyboardButton[][] buttons = {{keyboardButton1}};
 
             ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup(buttons);
 
