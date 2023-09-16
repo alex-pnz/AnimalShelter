@@ -15,6 +15,7 @@ import pro.sky.animalshelter.model.Shelter;
 import pro.sky.animalshelter.model.Visitor;
 import pro.sky.animalshelter.service.MenuService;
 import pro.sky.animalshelter.service.MessageService;
+import pro.sky.animalshelter.service.VisitService;
 import pro.sky.animalshelter.service.VisitorService;
 
 import java.util.List;
@@ -33,17 +34,20 @@ public class TelegramBotUpdateListener implements UpdatesListener {
     private final MessageService messageService;
     private final VisitorService visitorService;
     private final ChatWithVolunteer chat;
+    private final VisitService visitService;
 
     private boolean enteringContactsPhoneNumber = false; // Используется только во время ввода контактных данных
     private boolean enteringContactsEmail = false; // Используется только во время ввода контактных данных
 
     public TelegramBotUpdateListener(TelegramBot bot, MenuService menuService, MessageService messageService,
-                                     VisitorService visitorService, ChatWithVolunteer chat) {
+                                     VisitorService visitorService, ChatWithVolunteer chat,
+                                     VisitService visitService) {
         this.bot = bot;
         this.menuService = menuService;
         this.messageService = messageService;
         this.visitorService = visitorService;
         this.chat = chat;
+        this.visitService = visitService;
     }
 
     @PostConstruct
@@ -120,6 +124,7 @@ public class TelegramBotUpdateListener implements UpdatesListener {
                 }
             } else if (update.callbackQuery() != null) {   // Здесь обрабатываем callback полученный из меню, потом надо добавить другие кейсы из других меню которые сделаем позже
                 CallbackQuery callbackQuery = update.callbackQuery();
+                visitService.addVisit(update);
                 Long chatId = callbackQuery.from().id();
 
                 messageService.showInfoAboutShelter(chatId);

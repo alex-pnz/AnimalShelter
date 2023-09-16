@@ -3,6 +3,8 @@ package pro.sky.animalshelter.service;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.response.SendResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pro.sky.animalshelter.listener.ChatWithVolunteer;
@@ -20,18 +22,19 @@ import static pro.sky.animalshelter.utils.Constants.*;
 
 @Service
 public class MessageService {
+    private final Logger logger = LoggerFactory.getLogger(MessageService.class);
 
     private final TelegramBot bot;
     private final VisitorRepository visitorRepository;
-    private final VisitRepository visitRepository;
+    private final VisitService visitService;
     private final ShelterRepository shelterRepository;
     private final MenuService menuService;
 
-    public MessageService(TelegramBot bot, VisitorRepository visitorRepository, VisitRepository visitRepository,
+    public MessageService(TelegramBot bot, VisitorRepository visitorRepository, VisitService visitService,
                           ShelterRepository shelterRepository, MenuService menuService) {
         this.bot = bot;
         this.visitorRepository = visitorRepository;
-        this.visitRepository = visitRepository;
+        this.visitService = visitService;
         this.shelterRepository = shelterRepository;
         this.menuService = menuService;
     }
@@ -82,10 +85,11 @@ public class MessageService {
      * @return AnimalType
      */
     private AnimalType getShelterType(Long chatId) {
-//        Visitor visitor = visitorRepository.findByChatId(chatId);
-//        Visit visit = visitRepository.findByVisitor(visitor);
-//        return visit.getShelter().getShelterType();
-        return AnimalType.CAT;
+        Visitor visitor = visitorRepository.findByChatId(chatId);
+//        logger.info("Visitor: {} for chat id {}", visitor.getId(), visitor.getChatId());
+        Visit visit = visitService.getCurrentVisitByVisitorId(visitor);
+//        logger.info("Visit {} to shelter {}", visit.getId(), visit.getShelter());
+        return visit.getShelter().getShelterType();
     }
 
     public SendResponse showSafetyMeasures(Long chatId) {
