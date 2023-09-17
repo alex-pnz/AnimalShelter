@@ -1,10 +1,14 @@
 package pro.sky.animalshelter.service;
 
 import com.pengrad.telegrambot.TelegramBot;
+import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.response.SendResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import pro.sky.animalshelter.exception.InvalidChatException;
 import pro.sky.animalshelter.listener.ChatWithVolunteer;
 import pro.sky.animalshelter.model.AnimalType;
 import pro.sky.animalshelter.model.Shelter;
@@ -15,23 +19,26 @@ import pro.sky.animalshelter.repository.VisitRepository;
 import pro.sky.animalshelter.repository.VisitorRepository;
 
 import java.time.LocalTime;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static pro.sky.animalshelter.utils.Constants.*;
 
 @Service
 public class MessageService {
+    private final Logger logger = LoggerFactory.getLogger(MessageService.class);
 
     private final TelegramBot bot;
     private final VisitorRepository visitorRepository;
-    private final VisitRepository visitRepository;
+    private final VisitService visitService;
     private final ShelterRepository shelterRepository;
     private final MenuService menuService;
 
-    public MessageService(TelegramBot bot, VisitorRepository visitorRepository, VisitRepository visitRepository,
+    public MessageService(TelegramBot bot, VisitorRepository visitorRepository, VisitService visitService,
                           ShelterRepository shelterRepository, MenuService menuService) {
         this.bot = bot;
         this.visitorRepository = visitorRepository;
-        this.visitRepository = visitRepository;
+        this.visitService = visitService;
         this.shelterRepository = shelterRepository;
         this.menuService = menuService;
     }
@@ -46,7 +53,7 @@ public class MessageService {
             SendMessage sendMessage = new SendMessage(chatId, SECURITY_CONTACT_INFO);
             return bot.execute(sendMessage);
         }
-        return null;
+        throw new InvalidChatException();
     }
     /**
      * Выводит информацию о выбранном ранее приюте
@@ -82,10 +89,11 @@ public class MessageService {
      * @return AnimalType
      */
     private AnimalType getShelterType(Long chatId) {
-//        Visitor visitor = visitorRepository.findByChatId(chatId);
-//        Visit visit = visitRepository.findByVisitor(visitor);
-//        return visit.getShelter().getShelterType();
-        return AnimalType.CAT;
+        Visitor visitor = visitorRepository.findByChatId(chatId);
+//        logger.info("Visitor: {} for chat id {}", visitor.getId(), visitor.getChatId());
+        Visit visit = visitService.getCurrentVisitByVisitorId(visitor);
+//        logger.info("Visit {} to shelter {}", visit.getId(), visit.getShelter());
+        return visit.getShelter().getShelterType();
     }
 
     public SendResponse showSafetyMeasures(Long chatId) {
@@ -106,6 +114,7 @@ public class MessageService {
      * @param chatId указать номер чата, в который бот отправит сообщение
      */
     public SendResponse showHelp(Long chatId) {
+        if (chatId == null || chatId < 0) throw new InvalidChatException();
         SendMessage sendMessage = new SendMessage(chatId, SHELTER_HELP);
         return bot.execute(sendMessage);
     }
@@ -117,6 +126,22 @@ public class MessageService {
      * @param message передает номер телефона для обработки
      */
     public SendResponse saveContactsPhoneNumber(Long chatId, String message){
+        if (chatId == null || chatId < 0) throw new InvalidChatException();
+
+        Pattern pattern = Pattern.compile(".* ([\\w-.]+@[\\w-]+\\.[a-z0-9]+).*");
+        Matcher matcher = pattern.matcher(message);
+        String email = null;
+
+        if (matcher.find()) {
+            email = matcher.group(1);
+        } else {
+            return bot.execute(new SendMessage(chatId, "К сожалению бот не смог распознать эл почту'. " +
+                    "(/add_contacts - попробовать ввести еще раз)"));
+        }
+
+        saveContactsEmail(chatId, email);
+        message = message.replace(email, "");
+
         message = message.replaceAll(" |\\(|\\)|\\+","");
 
         if (message.matches("[0-9]{11}") && message.matches("^[78].+")){
@@ -138,6 +163,7 @@ public class MessageService {
      * @param message передает адрес электронной почты для обработки
      */
     public SendResponse saveContactsEmail(Long chatId, String message){
+        if (chatId == null || chatId < 0) throw new InvalidChatException();
         message = message.trim();
 
         if (message.matches("[\\w-.]+@[\\w-]+\\.[a-z0-9]+")){
@@ -166,5 +192,18 @@ public class MessageService {
     public SendResponse sendMessage(Long chatId, String message) {
         SendMessage sendMessage = new SendMessage(chatId, message);
         return bot.execute(sendMessage);
+    }
+
+    /**
+     * функция обработки событий, для которых не реализованы специфические
+     * обработчики
+     *
+     * @param update
+     */
+    public void defaultHandler(Update update) {
+        SendMessage message = new SendMessage((update.message() != null)?
+                update.message().chat().id():update.callbackQuery().from().id(),
+                "This command is not yet supported");
+        bot.execute(message);
     }
 }

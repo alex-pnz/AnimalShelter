@@ -26,6 +26,14 @@ public class Visit {
 
     private LocalDate visitDate = LocalDate.now();
 
+    public Visit(){}
+    public Visit(Long id, Shelter shelter, Visitor visitor, LocalDate visitDate) {
+        this.id = id;
+        this.shelter = shelter;
+        this.visitor = visitor;
+        this.visitDate = visitDate;
+    }
+
     public Long getId() {
         return id;
     }
