@@ -148,6 +148,35 @@ class MessageServiceTest {
 
     @Test
     public void showShelterSchedule() {
+
+    }
+    static Stream<Arguments> provideParametersShelterScheduleFail() {
+        return Stream.of(
+                Arguments.of((Long) null),
+                Arguments.of(-123L)
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideParametersShelterScheduleFail")
+    public void showShelterScheduleFail(Long chatId) {
+
+        assertThrows(InvalidChatException.class, () -> messageService.showShelterSchedule(chatId));
+
+    }
+
+    @Test
+    public void showShelterSchedulePass() {
+
+        messageService.showShelterSchedule(CHAT_ID);
+
+        ArgumentCaptor<SendMessage> argumentCaptor = ArgumentCaptor.forClass(SendMessage.class);
+        verify(bot).execute(argumentCaptor.capture());
+        SendMessage actual = argumentCaptor.getValue();
+
+        assertThat(actual.getParameters().get("chat_id")).isEqualTo(CHAT_ID);
+        assertThat(actual.getParameters().get("text")).isEqualTo(SHELTER_SCHEDULE);
+
     }
 
     @Test
