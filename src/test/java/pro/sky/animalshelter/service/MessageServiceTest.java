@@ -5,7 +5,6 @@ import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -17,23 +16,31 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import pro.sky.animalshelter.exception.InvalidChatException;
+import pro.sky.animalshelter.model.AnimalType;
+import pro.sky.animalshelter.model.Shelter;
+import pro.sky.animalshelter.model.Visit;
 import pro.sky.animalshelter.model.Visitor;
 import pro.sky.animalshelter.repository.VisitorRepository;
 
+import java.time.LocalDate;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static pro.sky.animalshelter.utils.Constants.SECURITY_CONTACT_INFO;
-import static pro.sky.animalshelter.utils.Constants.SHELTER_HELP;
+import static pro.sky.animalshelter.utils.Constants.*;
 
 @ExtendWith(MockitoExtension.class)
 class MessageServiceTest {
 
     @Mock
     private VisitorRepository visitorRepository;
+    @Mock
+    private VisitService visitService;
+    @Mock
+    private MenuService menuService;
     @Mock
     private TelegramBot bot;
     @InjectMocks
@@ -88,7 +95,55 @@ class MessageServiceTest {
     }
 
     @Test
-    public void showInfoAboutShelter() {
+    public void showInfoAboutCatShelter() {
+        Visitor visitor = new Visitor(CHAT_ID, "Test Name", null, null);
+        Shelter catShelter = new Shelter();
+        catShelter.setShelterType(AnimalType.CAT);
+
+        when(menuService.setHelpButton(CHAT_ID)).thenReturn(null);
+        when(visitorRepository.findByChatId(CHAT_ID)).thenReturn(visitor);
+        when(visitService.getCurrentVisitByVisitorId(visitor)).thenReturn(
+                new Visit(1L, catShelter,visitor, LocalDate.now()));
+
+        messageService.showInfoAboutShelter(CHAT_ID);
+
+        ArgumentCaptor<SendMessage> argumentCaptor = ArgumentCaptor.forClass(SendMessage.class);
+        verify(bot).execute(argumentCaptor.capture());
+        SendMessage actual = argumentCaptor.getValue();
+
+        assertThat(actual.getParameters().get("chat_id")).isEqualTo(CHAT_ID);
+        assertThat(actual.getParameters().get("text")).isEqualTo(CAT_SHELTER_DESCRIPTION);
+    }
+
+    @Test
+    public void showInfoAboutDogShelter() {
+        Visitor visitor = new Visitor(CHAT_ID, "Test Name", null, null);
+        Shelter dogShelter = new Shelter();
+        dogShelter.setShelterType(AnimalType.DOG);
+
+        when(menuService.setHelpButton(CHAT_ID)).thenReturn(null);
+        when(visitorRepository.findByChatId(CHAT_ID)).thenReturn(visitor);
+        when(visitService.getCurrentVisitByVisitorId(visitor)).thenReturn(
+                new Visit(1L, dogShelter,visitor, LocalDate.now()));
+
+        messageService.showInfoAboutShelter(CHAT_ID);
+
+        ArgumentCaptor<SendMessage> argumentCaptor = ArgumentCaptor.forClass(SendMessage.class);
+        verify(bot).execute(argumentCaptor.capture());
+        SendMessage actual = argumentCaptor.getValue();
+
+        assertThat(actual.getParameters().get("chat_id")).isEqualTo(CHAT_ID);
+        assertThat(actual.getParameters().get("text")).isEqualTo(DOG_SHELTER_DESCRIPTION);
+    }
+
+    @Test
+    public void showInfoAboutNullShelter() {
+        Visitor visitor = new Visitor(CHAT_ID, "Test Name", null, null);
+        Shelter shelter = new Shelter();
+        when(visitorRepository.findByChatId(CHAT_ID)).thenReturn(visitor);
+        when(visitService.getCurrentVisitByVisitorId(visitor)).thenReturn(
+                new Visit(1L, shelter,visitor, LocalDate.now()));
+        assertNull(messageService.showInfoAboutShelter(CHAT_ID));
     }
 
     @Test
@@ -192,7 +247,7 @@ class MessageServiceTest {
     @ParameterizedTest
     @MethodSource("provideParametersSaveContactsPhoneNumberWrongNumber")
     public void saveContactsPhoneNumberWrongNumber(String message) {
-        when(visitorRepository.findByChatId(CHAT_ID)).thenReturn(new Visitor(CHAT_ID,"Test Name",null,null));
+        when(visitorRepository.findByChatId(CHAT_ID)).thenReturn(new Visitor(CHAT_ID, "Test Name", null, null));
 
         messageService.saveContactsPhoneNumber(CHAT_ID, message);
 
@@ -205,7 +260,7 @@ class MessageServiceTest {
                 "(/add_contacts - попробовать ввести еще раз)");
 
         ArgumentCaptor<Visitor> argumentCaptorVisitor = ArgumentCaptor.forClass(Visitor.class);
-        verify(visitorRepository,times(1)).save(argumentCaptorVisitor.capture());
+        verify(visitorRepository, times(1)).save(argumentCaptorVisitor.capture());
         Visitor actualVisitor = argumentCaptorVisitor.getValue();
 
         assertThat(actualVisitor.getVisitorName()).isEqualTo("Test Name");
@@ -229,7 +284,7 @@ class MessageServiceTest {
     @ParameterizedTest
     @MethodSource("provideParametersSaveContactsPhoneNumberPass")
     public void saveContactsPhoneNumberPass(String message, String phoneNumber) {
-        when(visitorRepository.findByChatId(CHAT_ID)).thenReturn(new Visitor(CHAT_ID,"Test Name",null,null));
+        when(visitorRepository.findByChatId(CHAT_ID)).thenReturn(new Visitor(CHAT_ID, "Test Name", null, null));
 
         messageService.saveContactsPhoneNumber(CHAT_ID, message);
 
@@ -241,7 +296,7 @@ class MessageServiceTest {
         assertThat(actual.getParameters().get("text")).isEqualTo("Номер " + phoneNumber + " сохранен!");
 
         ArgumentCaptor<Visitor> argumentCaptorVisitor = ArgumentCaptor.forClass(Visitor.class);
-        verify(visitorRepository,times(2)).save(argumentCaptorVisitor.capture());
+        verify(visitorRepository, times(2)).save(argumentCaptorVisitor.capture());
         Visitor actualVisitor = argumentCaptorVisitor.getValue();
 
         assertThat(actualVisitor.getVisitorName()).isEqualTo("Test Name");
@@ -271,11 +326,11 @@ class MessageServiceTest {
 
     @Test
     public void saveContactsEmailPass() {
-        Visitor expected = new Visitor(CHAT_ID,"Test Name",null,"test@test.com");
+        Visitor expected = new Visitor(CHAT_ID, "Test Name", null, "test@test.com");
 
-        when(visitorRepository.findByChatId(CHAT_ID)).thenReturn(new Visitor(CHAT_ID,"Test Name",null,null));
+        when(visitorRepository.findByChatId(CHAT_ID)).thenReturn(new Visitor(CHAT_ID, "Test Name", null, null));
 
-        messageService.saveContactsEmail(CHAT_ID,"test@test.com");
+        messageService.saveContactsEmail(CHAT_ID, "test@test.com");
 
         ArgumentCaptor<Visitor> argumentCaptor = ArgumentCaptor.forClass(Visitor.class);
 
@@ -306,7 +361,7 @@ class MessageServiceTest {
         messageService.saveContactsEmail(CHAT_ID, message);
 
         ArgumentCaptor<SendMessage> argumentCaptor = ArgumentCaptor.forClass(SendMessage.class);
-        verify(bot,times(1)).execute(argumentCaptor.capture());
+        verify(bot, times(1)).execute(argumentCaptor.capture());
         SendMessage actual = argumentCaptor.getValue();
 
         assertThat(actual.getParameters().get("chat_id")).isEqualTo(CHAT_ID);
@@ -318,10 +373,27 @@ class MessageServiceTest {
 
     @Test
     public void showFindVolunteerInfo() {
+        messageService.showFindVolunteerInfo(CHAT_ID);
+
+        ArgumentCaptor<SendMessage> argumentCaptor = ArgumentCaptor.forClass(SendMessage.class);
+        verify(bot).execute(argumentCaptor.capture());
+        SendMessage actual = argumentCaptor.getValue();
+
+        assertThat(actual.getParameters().get("chat_id")).isEqualTo(CHAT_ID);
+        assertThat(actual.getParameters().get("text")).isEqualTo("Идет поиск волонтера");
     }
 
     @Test
     public void sendMessage() {
+        String message = "message";
+        messageService.sendMessage(CHAT_ID, message);
+
+        ArgumentCaptor<SendMessage> argumentCaptor = ArgumentCaptor.forClass(SendMessage.class);
+        verify(bot).execute(argumentCaptor.capture());
+        SendMessage actual = argumentCaptor.getValue();
+
+        assertThat(actual.getParameters().get("chat_id")).isEqualTo(CHAT_ID);
+        assertThat(actual.getParameters().get("text")).isEqualTo(message);
     }
 
     static Stream<Arguments> provideParametersdefaultHandlerMessage() { // передаем не существующую команду
@@ -351,7 +423,7 @@ class MessageServiceTest {
         messageService.defaultHandler(update);
 
         ArgumentCaptor<SendMessage> argumentCaptor = ArgumentCaptor.forClass(SendMessage.class);
-        verify(bot,times(1)).execute(argumentCaptor.capture());
+        verify(bot, times(1)).execute(argumentCaptor.capture());
         SendMessage actual = argumentCaptor.getValue();
 
         assertThat(actual.getParameters().get("chat_id")).isEqualTo(CHAT_ID);
@@ -387,7 +459,7 @@ class MessageServiceTest {
         messageService.defaultHandler(update);
 
         ArgumentCaptor<SendMessage> argumentCaptor = ArgumentCaptor.forClass(SendMessage.class);
-        verify(bot,times(1)).execute(argumentCaptor.capture());
+        verify(bot, times(1)).execute(argumentCaptor.capture());
         SendMessage actual = argumentCaptor.getValue();
 
         assertThat(actual.getParameters().get("chat_id")).isEqualTo(CHAT_ID);
