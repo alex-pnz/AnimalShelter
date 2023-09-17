@@ -45,6 +45,7 @@ public class MessageService {
 
     /**
      * Выводит данные службы охраны для оформления пропуска на машину
+     *
      * @param chatId указать номер чата, в который бот отправит сообщение
      * @return для облегчения процесса тестирования метода, возвращаем объект класса SendResponse
      */
@@ -55,14 +56,16 @@ public class MessageService {
         }
         throw new InvalidChatException();
     }
+
     /**
      * Выводит информацию о выбранном ранее приюте
+     *
      * @param chatId указать номер чата, в который бот отправит сообщение
      */
     public SendResponse showInfoAboutShelter(Long chatId) {
         SendMessage sendMessage;
         AnimalType shelterType = getShelterType(chatId);
-        if(shelterType == AnimalType.CAT){
+        if (shelterType == AnimalType.CAT) {
             sendMessage = new SendMessage(chatId, CAT_SHELTER_DESCRIPTION);
             sendMessage.replyMarkup(menuService.setHelpButton(chatId));
             return bot.execute(sendMessage);
@@ -73,18 +76,24 @@ public class MessageService {
         }
         return null;
     }
+
     /**
      * Выводит информацию о расписании в выбранном приюте
      *
      * @param chatId указать номер чата, в который бот отправит сообщение
      */
     public SendResponse showShelterSchedule(Long chatId) {
-        SendMessage sendMessage = new SendMessage(chatId, SHELTER_SCHEDULE);
+        if (chatId != null && chatId >= 0) {
+            SendMessage sendMessage = new SendMessage(chatId, SHELTER_SCHEDULE);
 
-        return bot.execute(sendMessage);
+            return bot.execute(sendMessage);
+        }
+        throw new InvalidChatException();
     }
+
     /**
      * Метод возвращающий тип приюта по chatId
+     *
      * @param chatId
      * @return AnimalType
      */
@@ -111,6 +120,7 @@ public class MessageService {
 
     /**
      * Выводит сообщение со всеми доступными командами
+     *
      * @param chatId указать номер чата, в который бот отправит сообщение
      */
     public SendResponse showHelp(Long chatId) {
@@ -122,10 +132,11 @@ public class MessageService {
     /**
      * Проверяет поступающий в message номер телефона с помощью регулярного выражения
      * и сохраняет его в базу данных
-     * @param chatId указать номер чата, в который бот отправит сообщение
+     *
+     * @param chatId  указать номер чата, в который бот отправит сообщение
      * @param message передает номер телефона для обработки
      */
-    public SendResponse saveContactsPhoneNumber(Long chatId, String message){
+    public SendResponse saveContactsPhoneNumber(Long chatId, String message) {
         if (chatId == null || chatId < 0) throw new InvalidChatException();
 
         Pattern pattern = Pattern.compile(".* ([\\w-.]+@[\\w-]+\\.[a-z0-9]+).*");
@@ -142,10 +153,10 @@ public class MessageService {
         saveContactsEmail(chatId, email);
         message = message.replace(email, "");
 
-        message = message.replaceAll(" |\\(|\\)|\\+","");
+        message = message.replaceAll(" |\\(|\\)|\\+", "");
 
-        if (message.matches("[0-9]{11}") && message.matches("^[78].+")){
-            if(message.startsWith("8")) message = message.replaceFirst("8","7");
+        if (message.matches("[0-9]{11}") && message.matches("^[78].+")) {
+            if (message.startsWith("8")) message = message.replaceFirst("8", "7");
             Visitor visitor = visitorRepository.findByChatId(chatId);
             visitor.setPhoneNumber("+" + message);
             visitorRepository.save(visitor);
@@ -159,14 +170,15 @@ public class MessageService {
     /**
      * Проверяет поступающий в message адрес электронной почты с помощью регулярного выражения
      * и сохраняет его в базу данных
-     * @param chatId указать номер чата, в который бот отправит сообщение
+     *
+     * @param chatId  указать номер чата, в который бот отправит сообщение
      * @param message передает адрес электронной почты для обработки
      */
-    public SendResponse saveContactsEmail(Long chatId, String message){
+    public SendResponse saveContactsEmail(Long chatId, String message) {
         if (chatId == null || chatId < 0) throw new InvalidChatException();
         message = message.trim();
 
-        if (message.matches("[\\w-.]+@[\\w-]+\\.[a-z0-9]+")){
+        if (message.matches("[\\w-.]+@[\\w-]+\\.[a-z0-9]+")) {
             Visitor visitor = visitorRepository.findByChatId(chatId);
             visitor.setEmail(message);
             visitorRepository.save(visitor);
@@ -178,15 +190,88 @@ public class MessageService {
 
     /**
      * Запускает поиск волонтера и информирует об этом пользователя
+     *
      * @param chatId указать номер чата, в который бот отправит сообщение
      */
     public SendResponse showFindVolunteerInfo(Long chatId) {
         SendMessage sendMessage = new SendMessage(chatId, "Идет поиск волонтера");
         return bot.execute(sendMessage);
     }
+
+    /**
+     * Выводит информацию о правилах знакомства с животным
+     *
+     * @param chatId указать номер чата, в который бот отправит сообщение
+     */
+    public SendResponse showPetHelloRules(Long chatId) {
+        SendMessage sendMessage = new SendMessage(chatId, PET_HELLO);
+
+        return null;
+    }
+
+    /**
+     * Выводит информацию о правилах перевозки животных
+     *
+     * @param chatId указать номер чата, в который бот отправит сообщение
+     */
+    public SendResponse showPetTransportRules(Long chatId) {
+        SendMessage sendMessage = new SendMessage(chatId, PET_TRANSPORT);
+
+        return null;
+    }
+
+    /**
+     * Выводит информацию о причинах отказа в усыновлении
+     *
+     * @param chatId указать номер чата, в который бот отправит сообщение
+     */
+    public SendResponse showRefusePolicy(Long chatId) {
+        SendMessage sendMessage = new SendMessage(chatId, REFUSE_POLICY);
+
+        return null;
+    }
+
+    /**
+     * Выводит советы кинолога для собак
+     *
+     * @param chatId указать номер чата, в который бот отправит сообщение
+     */
+    public SendResponse showDogWhispererInfo(Long chatId) {
+        SendMessage sendMessage;
+        AnimalType shelterType = getShelterType(chatId);
+        if (shelterType == AnimalType.CAT) {
+            sendMessage = new SendMessage(chatId, PET_HELLO);
+            return bot.execute(sendMessage);
+        } else if (shelterType == AnimalType.DOG) {
+            sendMessage = new SendMessage(chatId, HOW_TO_HELLO_DOG);
+            sendMessage.replyMarkup(menuService.setHelpButton(chatId));
+            return bot.execute(sendMessage);
+        }
+        return null;
+    }
+
+    /**
+     * Выводит контакт проверенного кинолога для собак
+     *
+     * @param chatId указать номер чата, в который бот отправит сообщение
+     */
+    public SendResponse showBestKinologInfo(Long chatId) {
+        SendMessage sendMessage;
+        AnimalType shelterType = getShelterType(chatId);
+        if (shelterType == AnimalType.CAT) {
+            return null;
+        } else if (shelterType == AnimalType.DOG) {
+            sendMessage = new SendMessage(chatId, KINOLOG_INFO);
+            sendMessage.replyMarkup(menuService.setHelpButton(chatId));
+            return bot.execute(sendMessage);
+        }
+        return null;
+    }
+
     /**
      * Отправляет сообщение в указанный чат
-     * @param chatId указать номер чата, в который бот отправит сообщение
+     *
+     * @param chatId  указать номер чата, в который бот отправит сообщение
      * @param message сообщение, которое будет отправлено
      */
     public SendResponse sendMessage(Long chatId, String message) {
@@ -201,8 +286,8 @@ public class MessageService {
      * @param update
      */
     public void defaultHandler(Update update) {
-        SendMessage message = new SendMessage((update.message() != null)?
-                update.message().chat().id():update.callbackQuery().from().id(),
+        SendMessage message = new SendMessage((update.message() != null) ?
+                update.message().chat().id() : update.callbackQuery().from().id(),
                 "This command is not yet supported");
         bot.execute(message);
     }

@@ -92,6 +92,14 @@ public class TelegramBotUpdateListener implements UpdatesListener {
                         case COMMAND_STOP_CHAT -> {
                             chat.stopChat(chatId);
                         }
+                        case COMMAND_HELLOPET -> {
+                            messageService.showPetHelloRules(chatId);
+                        }
+                        case COMMAND_TRANSPORT -> {
+                            messageService.showPetTransportRules(chatId);
+                        }
+                        case COMMAND_REFUSE -> {
+                            messageService.showRefusePolicy(chatId);}
                         default -> {
                             messageService.defaultHandler(update);
                         }
