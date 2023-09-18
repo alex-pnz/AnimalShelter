@@ -29,7 +29,6 @@ class MenuServiceTest {
     @Mock
     private TelegramBot bot;
     @InjectMocks
-    @Autowired
     private MenuService menuService;
 
     // Testing showMainMenu
