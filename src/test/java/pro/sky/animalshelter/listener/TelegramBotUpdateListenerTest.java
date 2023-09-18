@@ -49,10 +49,9 @@ class TelegramBotUpdateListenerTest {
     private ChatWithVolunteer chat;
 
     @InjectMocks
-    @Autowired
     private TelegramBotUpdateListener telegramBotUpdateListener;
 
-    private final Long CHAT_ID = 123L;
+    private final Long chatId = 123L;
 
     // Testing "/start"
 
@@ -68,7 +67,7 @@ class TelegramBotUpdateListenerTest {
     public void testStart(String command, VerificationMode mode) throws URISyntaxException, IOException {
         telegramBotUpdateListener.process(Collections.singletonList(getUpdate(command, true)));
 
-        verify(menuService, mode).showMainMenu(CHAT_ID);
+        verify(menuService, mode).showMainMenu(chatId);
 
     }
 
@@ -86,7 +85,7 @@ class TelegramBotUpdateListenerTest {
     public void testAbout(String command, VerificationMode mode) throws URISyntaxException, IOException {
         telegramBotUpdateListener.process(Collections.singletonList(getUpdate(command, true)));
 
-        verify(messageService, mode).showInfoAboutShelter(CHAT_ID);
+        verify(messageService, mode).showInfoAboutShelter(chatId);
 
     }
 
@@ -104,7 +103,7 @@ class TelegramBotUpdateListenerTest {
     public void testSchedule(String command, VerificationMode mode) throws URISyntaxException, IOException {
         telegramBotUpdateListener.process(Collections.singletonList(getUpdate(command, true)));
 
-        verify(messageService, mode).showShelterSchedule(CHAT_ID);
+        verify(messageService, mode).showShelterSchedule(chatId);
 
     }
 
@@ -122,7 +121,7 @@ class TelegramBotUpdateListenerTest {
     public void testSecurity(String command, VerificationMode mode) throws URISyntaxException, IOException {
         telegramBotUpdateListener.process(Collections.singletonList(getUpdate(command, true)));
 
-        verify(messageService, mode).showSecurityInfo(CHAT_ID);
+        verify(messageService, mode).showSecurityInfo(chatId);
 
     }
 
@@ -139,7 +138,7 @@ class TelegramBotUpdateListenerTest {
     public void testSafety(String command, VerificationMode mode) throws URISyntaxException, IOException {
         telegramBotUpdateListener.process(Collections.singletonList(getUpdate(command, true)));
 
-        verify(messageService, mode).showSafetyMeasures(CHAT_ID);
+        verify(messageService, mode).showSafetyMeasures(chatId);
 
     }
 
@@ -152,7 +151,7 @@ class TelegramBotUpdateListenerTest {
         verify(bot).execute(argumentCaptor.capture());
         SendMessage actual = argumentCaptor.getValue();
 
-        assertThat(actual.getParameters().get("chat_id")).isEqualTo(CHAT_ID);
+        assertThat(actual.getParameters().get("chat_id")).isEqualTo(chatId);
         assertThat(actual.getParameters().get("text")).isEqualTo(
                 "Напишите одним сообщением Ваш номер телефона и электронную почту:");
 
@@ -172,8 +171,8 @@ class TelegramBotUpdateListenerTest {
     public void testVolunteer(String command, VerificationMode mode) throws URISyntaxException, IOException {
         telegramBotUpdateListener.process(Collections.singletonList(getUpdate(command, true)));
 
-        verify(messageService, mode).showFindVolunteerInfo(CHAT_ID);
-        verify(chat, mode).findVolunteer(CHAT_ID);
+        verify(messageService, mode).showFindVolunteerInfo(chatId);
+        verify(chat, mode).findVolunteer(chatId);
 
     }
 
@@ -189,7 +188,59 @@ class TelegramBotUpdateListenerTest {
     public void testStopChat(String command, VerificationMode mode) throws URISyntaxException, IOException {
         telegramBotUpdateListener.process(Collections.singletonList(getUpdate(command, true)));
 
-        verify(chat, mode).stopChat(CHAT_ID);
+        verify(chat, mode).stopChat(chatId);
+
+    }
+
+    // Testing "/hellopet"
+    static Stream<Arguments> provideParametersHelloPet() {
+        return Stream.of(
+                Arguments.of(COMMAND_HELLOPET, atLeastOnce()),
+                Arguments.of("any other message", never())
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideParametersHelloPet")
+    public void testHelloPet(String command, VerificationMode mode) throws URISyntaxException, IOException {
+        telegramBotUpdateListener.process(Collections.singletonList(getUpdate(command, true)));
+
+        verify(messageService, mode).showPetHelloRules(chatId);
+
+    }
+
+
+    // Testing "/transport"
+    static Stream<Arguments> provideParametersTransport() {
+        return Stream.of(
+                Arguments.of(COMMAND_TRANSPORT, atLeastOnce()),
+                Arguments.of("any other message", never())
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideParametersTransport")
+    public void testTransport(String command, VerificationMode mode) throws URISyntaxException, IOException {
+        telegramBotUpdateListener.process(Collections.singletonList(getUpdate(command, true)));
+
+        verify(messageService, mode).showPetTransportRules(chatId);
+
+    }
+
+    // Testing "/refuse"
+    static Stream<Arguments> provideParametersRefuse() {
+        return Stream.of(
+                Arguments.of(COMMAND_REFUSE, atLeastOnce()),
+                Arguments.of("any other message", never())
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideParametersRefuse")
+    public void testRefuse(String command, VerificationMode mode) throws URISyntaxException, IOException {
+        telegramBotUpdateListener.process(Collections.singletonList(getUpdate(command, true)));
+
+        verify(messageService, mode).showRefusePolicy(chatId);
 
     }
 
@@ -259,7 +310,7 @@ class TelegramBotUpdateListenerTest {
 
         telegramBotUpdateListener.process(Collections.singletonList(getUpdate(message, true)));
 
-        verify(messageService, mode).saveContactsPhoneNumber(CHAT_ID,message);
+        verify(messageService, mode).saveContactsPhoneNumber(chatId,message);
     }
 
     // Testing showInfoAboutShelter

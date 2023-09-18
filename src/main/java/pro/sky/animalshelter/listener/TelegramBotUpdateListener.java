@@ -35,6 +35,7 @@ public class TelegramBotUpdateListener implements UpdatesListener {
     private final VisitorService visitorService;
     private final ChatWithVolunteer chat;
     private final VisitService visitService;
+    private static final String PHONE_NUMBER_EMAIL_REGEXP = "^[\\d].+|^\\+[\\d].+";
 
 
     public TelegramBotUpdateListener(TelegramBot bot, MenuService menuService, MessageService messageService,
@@ -112,7 +113,7 @@ public class TelegramBotUpdateListener implements UpdatesListener {
 
 
                     //обрабатываем номер телефона и почту
-                } else if (text.matches("^[\\d].+|^\\+[\\d].+") && text.contains("@")) {
+                } else if (text.matches(PHONE_NUMBER_EMAIL_REGEXP) && text.contains("@")) {
                     messageService.saveContactsPhoneNumber(chatId, text);
 
 
