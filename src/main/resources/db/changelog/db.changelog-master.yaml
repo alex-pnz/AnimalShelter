@@ -7,3 +7,9 @@ databaseChangeLog:
       file: classpath:db/changelog/changes/003-modify-column-type-visitor.sql
   - include:
       file: classpath:db/changelog/changes/004-modify-animal-type-columns.sql
+  - include:
+      file: classpath:db/changelog/changes/005-adding-initial-shelters.sql
+  - include:
+      file: classpath:db/changelog/changes/006-add-volunteer-table.sql
+  - include:
+      file: classpath:db/changelog/changes/007-updating-values-in-shelter.sql
