@@ -183,34 +183,49 @@ public class Constants {
             555-72-11-2 или пишите в телеграмм @BestKinologEver
             """;
 
-
-    public static String SHELTER_HELP = """
-            Список доступных команд:
-            /start - Главное меню
-            /about - Информация о выбранном приюте
-            /schedule - Расписание работы
-            /security - Kонтактные данные охраны для оформления пропуска
-            /safety - Oбщие рекомендации о технике безопасности на территории приюта
-            /add_contacts - Записать контактные данные посетителя для связи
-            /volunteer - Если остались вопросы, то можно позвать волонтера
-            /hellopet - Правила знакомства с животным до того, как забрать его из приюта
-            /transport - Список рекомендаций по транспортировке животного
-            /refuse - Возможные причины для отказа в передаче животного
-            """;
-
+    // Commands
     public final static String COMMAND_START = "/start";
-    public final static String COMMAND_ABOUT = "/about";
-    public final static String COMMAND_SCHEDULE = "/schedule";
-    public final static String COMMAND_SECURITY = "/security";
-    public final static String COMMAND_SAFETY = "/safety";
-    public final static String COMMAND_ADD_CONTACTS = "/add_contacts";
-    public final static String COMMAND_VOLUNTEER = "/volunteer";
     public final static String COMMAND_STOP_CHAT = "/stopChat";
-    public final static String COMMAND_HELP = "\uD83D\uDC3E Помощь";
 
-    public final static String COMMAND_HELLOPET = "/hellopet";
-    public final static String COMMAND_TRANSPORT = "/transport";
-    public final static String COMMAND_REFUSE = "/refuse";
+    // Callbacks
+    // Main Menu
     public final static String CALLBACK_MENU_CAT = "cat";
     public final static String CALLBACK_MENU_DOG = "dog";
+    public final static String CALLBACK_START_VOLUNTEER_SESSION = "startVolunteerSession";
+
+
+    // Volunteer Menu
+    public final static String CALLBACK_CONTACT_ADOPTER = "contactAdopter";
+    public final static String CALLBACK_SEND_ADOPTER_WARNING = "sendAdopterWarning";
+    public final static String CALLBACK_CHANGE_PROBATION_TERMS = "changeProbationTerms";
+    public final static String CALLBACK_END_VOLUNTEER_SESSION = "endVolunteerSession";
+
+    // Shelter Menu
+    public final static String CALLBACK_SHELTER_INFO_MENU = "shelterInfoMenu";
+    public final static String CALLBACK_ADOPTION_INFO = "adoptionInfo";
+    public final static String CALLBACK_SEND_REPORT_TO_VOLUNTEER = "sendReportToVolunteer";
+    public final static String CALLBACK_CALL_VOLUNTEER = "callVolunteer";
+
+    // Shelter Info Menu
+    public final static String CALLBACK_SHELTER_INFO = "shelterInfo";
+    public final static String CALLBACK_SCHEDULE_ADDRESS = "timetableAndAddress";
+    public final static String CALLBACK_SHELTER_ADMISSION = "shelterAdmission";
+    public final static String CALLBACK_SAFETY_RULES = "safetyRules";
+    public final static String CALLBACK_SAVE_VISITOR_CONTACTS = "saveVisitorContacts";
+    public final static String CALLBACK_BACK_TO_CHOOSE_SHELTER = "backToChooseShelter";
+    public final static String CALLBACK_BACK_TO_MAIN_MENU = "backToMainMenu";
+
+    // Animal Adoption Menu
+    public final static String CALLBACK_HELLO_PET = "helloPetInfo";
+    public final static String CALLBACK_NECESSARY_PAPERS = "necessaryPapers";
+    public final static String CALLBACK_TRANSPORT_ANIMAL_INFO = "transportAnimalInfo";
+    public final static String CALLBACK_KITTEN_HOUSE_INFO = "kittenHouseInfo";
+    public final static String CALLBACK_CAT_HOUSE_INFO = "catHouseInfo";
+    public final static String CALLBACK_DOG_WHISPERER_INFO = "showDogWhispererInfo";
+    public final static String CALLBACK_BEST_KINOLOG_INFO = "showBestKinologInfo";
+    public final static String CALLBACK_HANDICAPPED_ANIMAL_HOUSE_INFO = "handicappedAnimalHouseInfo";
+    public final static String CALLBACK_ADOPTION_REFUSAL_INFO = "adoptionRefusalInfo";
+
+
+
 }
