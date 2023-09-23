@@ -6,19 +6,14 @@ import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.response.SendResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pro.sky.animalshelter.exception.InvalidChatException;
-import pro.sky.animalshelter.listener.ChatWithVolunteer;
 import pro.sky.animalshelter.model.AnimalType;
-import pro.sky.animalshelter.model.Shelter;
 import pro.sky.animalshelter.model.Visit;
 import pro.sky.animalshelter.model.Visitor;
 import pro.sky.animalshelter.repository.ShelterRepository;
-import pro.sky.animalshelter.repository.VisitRepository;
 import pro.sky.animalshelter.repository.VisitorRepository;
 
-import java.time.LocalTime;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -67,11 +62,9 @@ public class MessageService {
         AnimalType shelterType = getShelterType(chatId);
         if (shelterType == AnimalType.CAT) {
             sendMessage = new SendMessage(chatId, CAT_SHELTER_DESCRIPTION);
-            sendMessage.replyMarkup(menuService.setHelpButton(chatId));
             return bot.execute(sendMessage);
         } else if (shelterType == AnimalType.DOG) {
             sendMessage = new SendMessage(chatId, DOG_SHELTER_DESCRIPTION);
-            sendMessage.replyMarkup(menuService.setHelpButton(chatId));
             return bot.execute(sendMessage);
         }
         return null;
@@ -97,7 +90,7 @@ public class MessageService {
      * @param chatId
      * @return AnimalType
      */
-    private AnimalType getShelterType(Long chatId) {
+    public AnimalType getShelterType(Long chatId) {
         Visitor visitor = visitorRepository.findByChatId(chatId);
 //        logger.info("Visitor: {} for chat id {}", visitor.getId(), visitor.getChatId());
         Visit visit = visitService.getCurrentVisitByVisitorId(visitor);
@@ -116,19 +109,6 @@ public class MessageService {
             return bot.execute(sendMessage);
         }
         return null;
-    }
-
-    /**
-     * Выводит сообщение со всеми доступными командами
-     *
-     * @param chatId указать номер чата, в который бот отправит сообщение
-     */
-    public SendResponse showHelp(Long chatId) {
-        if (chatId == null || chatId < 0){
-            throw new InvalidChatException();
-        }
-        SendMessage sendMessage = new SendMessage(chatId, SHELTER_HELP);
-        return bot.execute(sendMessage);
     }
 
     /**
@@ -212,7 +192,7 @@ public class MessageService {
     public SendResponse showPetHelloRules(Long chatId) {
         SendMessage sendMessage = new SendMessage(chatId, PET_HELLO);
 
-        return null;
+        return bot.execute(sendMessage);
     }
 
     /**
@@ -223,7 +203,7 @@ public class MessageService {
     public SendResponse showPetTransportRules(Long chatId) {
         SendMessage sendMessage = new SendMessage(chatId, PET_TRANSPORT);
 
-        return null;
+        return bot.execute(sendMessage);
     }
 
     /**
@@ -234,7 +214,7 @@ public class MessageService {
     public SendResponse showRefusePolicy(Long chatId) {
         SendMessage sendMessage = new SendMessage(chatId, REFUSE_POLICY);
 
-        return null;
+        return bot.execute(sendMessage);
     }
 
     /**
@@ -250,7 +230,6 @@ public class MessageService {
             return bot.execute(sendMessage);
         } else if (shelterType == AnimalType.DOG) {
             sendMessage = new SendMessage(chatId, HOW_TO_HELLO_DOG);
-            sendMessage.replyMarkup(menuService.setHelpButton(chatId));
             return bot.execute(sendMessage);
         }
         return null;
@@ -268,7 +247,6 @@ public class MessageService {
             return null;
         } else if (shelterType == AnimalType.DOG) {
             sendMessage = new SendMessage(chatId, KINOLOG_INFO);
-            sendMessage.replyMarkup(menuService.setHelpButton(chatId));
             return bot.execute(sendMessage);
         }
         return null;
