@@ -253,6 +253,24 @@ public class MessageService {
     }
 
     /**
+     * Выводит данные по содержанию котят и щенков
+     *
+     * @param chatId указать номер чата, в который бот отправит сообщение
+     */
+    public SendResponse showKittenPuppyInfo(Long chatId) {
+        SendMessage sendMessage;
+        AnimalType shelterType = getShelterType(chatId);
+        if (shelterType == AnimalType.CAT) {
+            sendMessage = new SendMessage(chatId, KITTEN_ADVICE);
+            return bot.execute(sendMessage);
+        } else if (shelterType == AnimalType.DOG) {
+            sendMessage = new SendMessage(chatId, PUPPY_ADVICE);
+            return bot.execute(sendMessage);
+        }
+        return null;
+    }
+
+    /**
      * Отправляет сообщение в указанный чат
      *
      * @param chatId  указать номер чата, в который бот отправит сообщение
