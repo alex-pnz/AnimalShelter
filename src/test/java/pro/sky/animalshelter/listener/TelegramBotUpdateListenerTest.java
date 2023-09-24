@@ -71,11 +71,92 @@ class TelegramBotUpdateListenerTest {
 
     }
 
-    // Testing "/about"
+    // Testing ShowShelterInfoMenu
+    static Stream<Arguments> provideParametersShelterInfoMenu() {
+        return Stream.of(
+                Arguments.of(CALLBACK_SHELTER_INFO_MENU, atLeastOnce()),
+                Arguments.of("something else", never())
+        );
+    }
+    @ParameterizedTest
+    @MethodSource("provideParametersShelterInfoMenu")
+    public void testShowShelterInfoMenu(String callback, VerificationMode mode) throws URISyntaxException, IOException {
+
+        telegramBotUpdateListener.process(Collections.singletonList(getUpdate(callback,false)));
+
+        verify(menuService, mode).showShelterInfoMenu(anyLong());
+    }
+
+    // Testing ShowAnimalAdoptionMenu
+    static Stream<Arguments> provideParametersShowAnimalAdoptionMenu() {
+        return Stream.of(
+                Arguments.of(CALLBACK_ADOPTION_INFO, atLeastOnce()),
+                Arguments.of("something else", never())
+        );
+    }
+    @ParameterizedTest
+    @MethodSource("provideParametersShowAnimalAdoptionMenu")
+    public void testShowAnimalAdoptionMenu(String callback, VerificationMode mode) throws URISyntaxException, IOException {
+
+        telegramBotUpdateListener.process(Collections.singletonList(getUpdate(callback,false)));
+
+        verify(menuService, mode).showAnimalAdoptionMenu(anyLong(),any());
+    }
+
+    // Testing ShowMainMenu
+    static Stream<Arguments> provideParametersShowMainMenu() {
+        return Stream.of(
+                Arguments.of(CALLBACK_BACK_TO_MAIN_MENU, atLeastOnce()),
+                Arguments.of("something else", never())
+        );
+    }
+    @ParameterizedTest
+    @MethodSource("provideParametersShowMainMenu")
+    public void testShowMainMenu(String callback, VerificationMode mode) throws URISyntaxException, IOException {
+
+        telegramBotUpdateListener.process(Collections.singletonList(getUpdate(callback,false)));
+
+        verify(menuService, mode).showMainMenu(anyLong());
+    }
+
+    // Testing ShowMainMenu
+    static Stream<Arguments> provideParametersShowDogWhispererInfo() {
+        return Stream.of(
+                Arguments.of(CALLBACK_DOG_WHISPERER_INFO, atLeastOnce()),
+                Arguments.of("something else", never())
+        );
+    }
+    @ParameterizedTest
+    @MethodSource("provideParametersShowDogWhispererInfo")
+    public void testShowDogWhispererInfo(String callback, VerificationMode mode) throws URISyntaxException, IOException {
+
+        telegramBotUpdateListener.process(Collections.singletonList(getUpdate(callback,false)));
+
+        verify(messageService, mode).showDogWhispererInfo(anyLong());
+    }
+
+    // Testing ShowMainMenu
+    static Stream<Arguments> provideParametersShowBestKinologInfo() {
+        return Stream.of(
+                Arguments.of(CALLBACK_BEST_KINOLOG_INFO, atLeastOnce()),
+                Arguments.of("something else", never())
+        );
+    }
+    @ParameterizedTest
+    @MethodSource("provideParametersShowBestKinologInfo")
+    public void testShowBestKinologInfo(String callback, VerificationMode mode) throws URISyntaxException, IOException {
+
+        telegramBotUpdateListener.process(Collections.singletonList(getUpdate(callback,false)));
+
+        verify(messageService, mode).showBestKinologInfo(anyLong());
+    }
+
+
+    // Testing About
 
     static Stream<Arguments> provideParametersAbout() {
         return Stream.of(
-                Arguments.of(COMMAND_ABOUT, atLeastOnce()),
+                Arguments.of(CALLBACK_SHELTER_INFO, atLeastOnce()),
                 Arguments.of("any other message", never())
         );
     }
@@ -83,17 +164,17 @@ class TelegramBotUpdateListenerTest {
     @ParameterizedTest
     @MethodSource("provideParametersAbout")
     public void testAbout(String command, VerificationMode mode) throws URISyntaxException, IOException {
-        telegramBotUpdateListener.process(Collections.singletonList(getUpdate(command, true)));
+        telegramBotUpdateListener.process(Collections.singletonList(getUpdate(command, false)));
 
         verify(messageService, mode).showInfoAboutShelter(chatId);
 
     }
 
-    // Testing "/schedule"
+    // Testing Schedule
 
     static Stream<Arguments> provideParametersSchedule() {
         return Stream.of(
-                Arguments.of(COMMAND_SCHEDULE, atLeastOnce()),
+                Arguments.of(CALLBACK_SCHEDULE_ADDRESS, atLeastOnce()),
                 Arguments.of("any other message", never())
         );
     }
@@ -101,17 +182,17 @@ class TelegramBotUpdateListenerTest {
     @ParameterizedTest
     @MethodSource("provideParametersSchedule")
     public void testSchedule(String command, VerificationMode mode) throws URISyntaxException, IOException {
-        telegramBotUpdateListener.process(Collections.singletonList(getUpdate(command, true)));
+        telegramBotUpdateListener.process(Collections.singletonList(getUpdate(command, false)));
 
         verify(messageService, mode).showShelterSchedule(chatId);
 
     }
 
-    // Testing "/security"
+    // Testing Security
 
     static Stream<Arguments> provideParametersSecurity() {
         return Stream.of(
-                Arguments.of(COMMAND_SECURITY, atLeastOnce()),
+                Arguments.of(CALLBACK_SHELTER_ADMISSION, atLeastOnce()),
                 Arguments.of("any other message", never())
         );
     }
@@ -119,16 +200,16 @@ class TelegramBotUpdateListenerTest {
     @ParameterizedTest
     @MethodSource("provideParametersSecurity")
     public void testSecurity(String command, VerificationMode mode) throws URISyntaxException, IOException {
-        telegramBotUpdateListener.process(Collections.singletonList(getUpdate(command, true)));
+        telegramBotUpdateListener.process(Collections.singletonList(getUpdate(command, false)));
 
         verify(messageService, mode).showSecurityInfo(chatId);
 
     }
 
-    // Testing "/safety"
+    // Testing Safety
     static Stream<Arguments> provideParametersSafety() {
         return Stream.of(
-                Arguments.of(COMMAND_SAFETY, atLeastOnce()),
+                Arguments.of(CALLBACK_SAFETY_RULES, atLeastOnce()),
                 Arguments.of("any other message", never())
         );
     }
@@ -136,16 +217,16 @@ class TelegramBotUpdateListenerTest {
     @ParameterizedTest
     @MethodSource("provideParametersSafety")
     public void testSafety(String command, VerificationMode mode) throws URISyntaxException, IOException {
-        telegramBotUpdateListener.process(Collections.singletonList(getUpdate(command, true)));
+        telegramBotUpdateListener.process(Collections.singletonList(getUpdate(command, false)));
 
         verify(messageService, mode).showSafetyMeasures(chatId);
 
     }
 
-    // Testing "/add_contacts"
+    // Testing Add_contacts
     @Test
     public void testAddContacts() throws URISyntaxException, IOException {
-        telegramBotUpdateListener.process(Collections.singletonList(getUpdate(COMMAND_ADD_CONTACTS, true)));
+        telegramBotUpdateListener.process(Collections.singletonList(getUpdate(CALLBACK_SAVE_VISITOR_CONTACTS, false)));
 
         ArgumentCaptor<SendMessage> argumentCaptor = ArgumentCaptor.forClass(SendMessage.class);
         verify(bot).execute(argumentCaptor.capture());
@@ -158,25 +239,25 @@ class TelegramBotUpdateListenerTest {
     }
 
 
-    // Testing "/volunteer"
+    // Testing Volunteer
 
     static Stream<Arguments> provideParametersVolunteer() {
         return Stream.of(
-                Arguments.of(COMMAND_VOLUNTEER, atLeastOnce()),
+                Arguments.of(CALLBACK_CALL_VOLUNTEER, atLeastOnce()),
                 Arguments.of("any other message", never())
         );
     }
     @ParameterizedTest
     @MethodSource("provideParametersVolunteer")
     public void testVolunteer(String command, VerificationMode mode) throws URISyntaxException, IOException {
-        telegramBotUpdateListener.process(Collections.singletonList(getUpdate(command, true)));
+        telegramBotUpdateListener.process(Collections.singletonList(getUpdate(command, false)));
 
         verify(messageService, mode).showFindVolunteerInfo(chatId);
         verify(chat, mode).findVolunteer(chatId);
 
     }
 
-    // Testing "/stopChat"
+    // Testing StopChat
     static Stream<Arguments> provideParametersStopChat() {
         return Stream.of(
                 Arguments.of(COMMAND_STOP_CHAT, atLeastOnce()),
@@ -192,10 +273,10 @@ class TelegramBotUpdateListenerTest {
 
     }
 
-    // Testing "/hellopet"
+    // Testing Hellopet
     static Stream<Arguments> provideParametersHelloPet() {
         return Stream.of(
-                Arguments.of(COMMAND_HELLOPET, atLeastOnce()),
+                Arguments.of(CALLBACK_HELLO_PET, atLeastOnce()),
                 Arguments.of("any other message", never())
         );
     }
@@ -203,17 +284,17 @@ class TelegramBotUpdateListenerTest {
     @ParameterizedTest
     @MethodSource("provideParametersHelloPet")
     public void testHelloPet(String command, VerificationMode mode) throws URISyntaxException, IOException {
-        telegramBotUpdateListener.process(Collections.singletonList(getUpdate(command, true)));
+        telegramBotUpdateListener.process(Collections.singletonList(getUpdate(command, false)));
 
         verify(messageService, mode).showPetHelloRules(chatId);
 
     }
 
 
-    // Testing "/transport"
+    // Testing Transport
     static Stream<Arguments> provideParametersTransport() {
         return Stream.of(
-                Arguments.of(COMMAND_TRANSPORT, atLeastOnce()),
+                Arguments.of(CALLBACK_TRANSPORT_ANIMAL_INFO, atLeastOnce()),
                 Arguments.of("any other message", never())
         );
     }
@@ -221,16 +302,16 @@ class TelegramBotUpdateListenerTest {
     @ParameterizedTest
     @MethodSource("provideParametersTransport")
     public void testTransport(String command, VerificationMode mode) throws URISyntaxException, IOException {
-        telegramBotUpdateListener.process(Collections.singletonList(getUpdate(command, true)));
+        telegramBotUpdateListener.process(Collections.singletonList(getUpdate(command, false)));
 
         verify(messageService, mode).showPetTransportRules(chatId);
 
     }
 
-    // Testing "/refuse"
+    // Testing Refuse
     static Stream<Arguments> provideParametersRefuse() {
         return Stream.of(
-                Arguments.of(COMMAND_REFUSE, atLeastOnce()),
+                Arguments.of(CALLBACK_ADOPTION_REFUSAL_INFO, atLeastOnce()),
                 Arguments.of("any other message", never())
         );
     }
@@ -238,26 +319,9 @@ class TelegramBotUpdateListenerTest {
     @ParameterizedTest
     @MethodSource("provideParametersRefuse")
     public void testRefuse(String command, VerificationMode mode) throws URISyntaxException, IOException {
-        telegramBotUpdateListener.process(Collections.singletonList(getUpdate(command, true)));
+        telegramBotUpdateListener.process(Collections.singletonList(getUpdate(command, false)));
 
         verify(messageService, mode).showRefusePolicy(chatId);
-
-    }
-
-    // Testing "\uD83D\uDC3E Помощь"
-
-    static Stream<Arguments> provideParametersHelp() {
-        return Stream.of(
-                Arguments.of(COMMAND_HELP, atLeastOnce()),
-                Arguments.of("any other message", never())
-        );
-    }
-    @ParameterizedTest
-    @MethodSource("provideParametersHelp")
-    public void testHelp(String command, VerificationMode mode) throws URISyntaxException, IOException {
-        telegramBotUpdateListener.process(Collections.singletonList(getUpdate(command, true)));
-
-        verify(messageService, mode).showHelp(any());
 
     }
 
@@ -329,7 +393,7 @@ class TelegramBotUpdateListenerTest {
 
         telegramBotUpdateListener.process(Collections.singletonList(getUpdate(callback,false)));
 
-        verify(messageService, mode).showInfoAboutShelter(anyLong());
+        verify(menuService, mode).showShelterMenu(anyLong());
     }
 
 

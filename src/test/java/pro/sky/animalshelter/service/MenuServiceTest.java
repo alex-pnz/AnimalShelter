@@ -1,13 +1,9 @@
 package pro.sky.animalshelter.service;
 
-import com.pengrad.telegrambot.BotUtils;
 import com.pengrad.telegrambot.TelegramBot;
-import com.pengrad.telegrambot.model.request.KeyboardButton;
 import com.pengrad.telegrambot.model.request.ReplyKeyboardMarkup;
 import com.pengrad.telegrambot.request.SendMessage;
-import com.pengrad.telegrambot.response.SendResponse;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -15,7 +11,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
+import pro.sky.animalshelter.model.AnimalType;
 
 import java.util.stream.Stream;
 
@@ -30,6 +26,8 @@ class MenuServiceTest {
     private TelegramBot bot;
     @InjectMocks
     private MenuService menuService;
+
+    private final Long chatId = 123L;
 
     // Testing showMainMenu
     static Stream<Arguments> provideParametersShowMain() {
@@ -46,24 +44,22 @@ class MenuServiceTest {
         assertNull(menuService.showMainMenu(chatId));
     }
 
-
     @Test
     public void showMainMenuPass() {
 
-        menuService.showMainMenu(123L);
+        menuService.showMainMenu(chatId);
 
         ArgumentCaptor<SendMessage> argumentCaptor = ArgumentCaptor.forClass(SendMessage.class);
         verify(bot,times(1)).execute(argumentCaptor.capture());
         SendMessage actualMessage = argumentCaptor.getValue();
 
-        Assertions.assertThat(actualMessage.getParameters().get("chat_id")).isEqualTo(123L);
+        Assertions.assertThat(actualMessage.getParameters().get("chat_id")).isEqualTo(chatId);
         Assertions.assertThat(actualMessage.getParameters().get("text")).isEqualTo("Правет Друг! Выбери приют:");
 
     }
 
-    // Testing setHelpButton
-
-    static Stream<Arguments> provideParametersHelpButtonNull() {
+    // Testing showVolunteerMenu
+    static Stream<Arguments> provideParametersShowVolunteer() {
         return Stream.of(
                 Arguments.of((Long) null),
                 Arguments.of(-1L)
@@ -71,19 +67,124 @@ class MenuServiceTest {
     }
 
     @ParameterizedTest
-    @MethodSource("provideParametersHelpButtonNull")
-    public void testSetHelpButtonNull(Long chatId) {
+    @MethodSource("provideParametersShowVolunteer")
+    public void showVolunteerMenuNull(Long chatId) {
 
-        assertNull(menuService.setHelpButton(chatId));
+        assertNull(menuService.showVolunteerMenu(chatId));
     }
-
 
     @Test
-    public void testSetHelpButtonPass() throws InstantiationException, IllegalAccessException {
+    public void showVolunteerMenuPass() {
 
-        ReplyKeyboardMarkup actual = menuService.setHelpButton(1L);
-        assertNotNull(actual);
-        Assertions.assertThat(actual).isInstanceOf(ReplyKeyboardMarkup.class);
+        menuService.showVolunteerMenu(chatId);
+
+        ArgumentCaptor<SendMessage> argumentCaptor = ArgumentCaptor.forClass(SendMessage.class);
+        verify(bot,times(1)).execute(argumentCaptor.capture());
+        SendMessage actualMessage = argumentCaptor.getValue();
+
+        Assertions.assertThat(actualMessage.getParameters().get("chat_id")).isEqualTo(chatId);
+        Assertions.assertThat(actualMessage.getParameters().get("text")).isEqualTo("Меню волонтера");
 
     }
+
+    // Testing showShelterMenu
+    static Stream<Arguments> provideParametersShowShelterMenu() {
+        return Stream.of(
+                Arguments.of((Long) null),
+                Arguments.of(-1L)
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideParametersShowShelterMenu")
+    public void showShelterMenuNull(Long chatId) {
+
+        assertNull(menuService.showShelterMenu(chatId));
+    }
+
+    @Test
+    public void showShelterMenuPass() {
+
+        menuService.showShelterMenu(chatId);
+
+        ArgumentCaptor<SendMessage> argumentCaptor = ArgumentCaptor.forClass(SendMessage.class);
+        verify(bot,times(1)).execute(argumentCaptor.capture());
+        SendMessage actualMessage = argumentCaptor.getValue();
+
+        Assertions.assertThat(actualMessage.getParameters().get("chat_id")).isEqualTo(chatId);
+        Assertions.assertThat(actualMessage.getParameters().get("text")).isEqualTo("Меню приюта");
+
+    }
+
+    // Testing showShelterInfoMenu
+    static Stream<Arguments> provideParametersShowShelterInfoMenu() {
+        return Stream.of(
+                Arguments.of((Long) null),
+                Arguments.of(-1L)
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideParametersShowShelterInfoMenu")
+    public void showShelterInfoMenuNull(Long chatId) {
+
+        assertNull(menuService.showShelterInfoMenu(chatId));
+    }
+
+    @Test
+    public void showShelterInfoMenuPass() {
+
+        menuService.showShelterInfoMenu(chatId);
+
+        ArgumentCaptor<SendMessage> argumentCaptor = ArgumentCaptor.forClass(SendMessage.class);
+        verify(bot,times(1)).execute(argumentCaptor.capture());
+        SendMessage actualMessage = argumentCaptor.getValue();
+
+        Assertions.assertThat(actualMessage.getParameters().get("chat_id")).isEqualTo(chatId);
+        Assertions.assertThat(actualMessage.getParameters().get("text")).isEqualTo("Информация по приюту");
+
+    }
+
+    // Testing showAnimalAdoptionMenu
+    static Stream<Arguments> provideParametersShowAnimalAdoptionMenu() {
+        return Stream.of(
+                Arguments.of(null, AnimalType.CAT),
+                Arguments.of(-1L, AnimalType.CAT),
+                Arguments.of(null, AnimalType.DOG),
+                Arguments.of(-1L, AnimalType.DOG),
+                Arguments.of(-1L, null)
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideParametersShowAnimalAdoptionMenu")
+    public void showAnimalAdoptionMenuNull(Long chatId, AnimalType type) {
+
+        assertNull(menuService.showAnimalAdoptionMenu(chatId, type));
+    }
+
+    static Stream<Arguments> provideParametersShowAnimalAdoptionPass() {
+        return Stream.of(
+                Arguments.of(123L, AnimalType.CAT),
+                Arguments.of(123L, AnimalType.DOG)
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideParametersShowAnimalAdoptionPass")
+    public void showAnimalAdoptionMenuPass(Long chatId, AnimalType type) {
+        String expectedString = "Информация о том как взять и заботиться о " +
+                (type == AnimalType.CAT?"кошке":"собаке");
+
+        menuService.showAnimalAdoptionMenu(chatId, type);
+
+        ArgumentCaptor<SendMessage> argumentCaptor = ArgumentCaptor.forClass(SendMessage.class);
+        verify(bot,times(1)).execute(argumentCaptor.capture());
+        SendMessage actualMessage = argumentCaptor.getValue();
+
+        Assertions.assertThat(actualMessage.getParameters().get("chat_id")).isEqualTo(chatId);
+        Assertions.assertThat(actualMessage.getParameters().get("text")).isEqualTo(expectedString);
+
+    }
+
 }

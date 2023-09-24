@@ -109,7 +109,7 @@ public class TelegramBotUpdateListener implements UpdatesListener {
                     // ShelterMenu
                     case CALLBACK_SHELTER_INFO_MENU -> menuService.showShelterInfoMenu(chatId);
                     case CALLBACK_ADOPTION_INFO -> menuService.showAnimalAdoptionMenu(chatId, messageService.getShelterType(chatId));
-//                    case CALLBACK_SEND_REPORT_TO_VOLUNTEER -> ; // Прислать отчет о питомце
+                    //case CALLBACK_SEND_REPORT_TO_VOLUNTEER -> ; // Прислать отчет о питомце
                     case CALLBACK_CALL_VOLUNTEER -> {
                         messageService.showFindVolunteerInfo(chatId);
                         chat.findVolunteer(chatId);
