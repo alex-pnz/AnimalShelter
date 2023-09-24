@@ -3,6 +3,7 @@ package pro.sky.animalshelter.model;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 /**
  * Класс, описывающий событие "усыновления" животного из приюта
@@ -55,5 +56,17 @@ public class Adoption {
 
     public void setAdoptionDate(LocalDate adoptionDate) {
         this.adoptionDate = adoptionDate;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Adoption adoption)) return false;
+        return Objects.equals(id, adoption.id) && Objects.equals(visitor, adoption.visitor) && Objects.equals(animal, adoption.animal) && Objects.equals(adoptionDate, adoption.adoptionDate);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, visitor, animal, adoptionDate);
     }
 }

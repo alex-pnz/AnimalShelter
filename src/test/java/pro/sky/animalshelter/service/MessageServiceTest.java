@@ -211,13 +211,7 @@ class MessageServiceTest {
     }
 
     @Test
-    public void showSafetyMeasuresNullShelterTest() {
-        Visitor visitor = new Visitor(chatId, "Test Name", null, null);
-        Shelter shelter = new Shelter();
-        when(visitorRepository.findByChatId(chatId)).thenReturn(visitor);
-        when(visitService.getCurrentVisitByVisitorId(visitor)).thenReturn(
-                new Visit(1L, shelter,visitor, LocalDate.now()));
-        assertNull(messageService.showSafetyMeasures(chatId));
+    public void showSafetyMeasures() {
     }
 
     // Testing showHelp

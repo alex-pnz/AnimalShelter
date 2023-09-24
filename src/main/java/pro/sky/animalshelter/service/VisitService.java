@@ -39,12 +39,10 @@ public class VisitService {
         Visit visit = new Visit();
         visit.setVisitDate(LocalDate.now());
         visit.setVisitor(visitorService.getVisitor(update));
-//        logger.info("shelter type {}", update.callbackQuery().data());
         visit.setShelter(
                 shelterService.getShelterByType(
                         AnimalType.valueOf(update.callbackQuery().data().toUpperCase())
                 ));
-//        logger.info("{} {} {}", visit.getVisitDate(), visit.getShelter(), visit.getVisitor());
         visitRepository.save(visit);
     }
 
