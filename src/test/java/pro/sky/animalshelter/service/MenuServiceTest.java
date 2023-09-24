@@ -26,6 +26,8 @@ class MenuServiceTest {
     private TelegramBot bot;
     @InjectMocks
     private MenuService menuService;
+    @Mock
+    private VolunteerService volunteerService;
 
     private final Long chatId = 123L;
 
@@ -46,11 +48,25 @@ class MenuServiceTest {
 
     @Test
     public void showMainMenuPass() {
-
+        when(volunteerService.isVolunteer(chatId)).thenReturn(false);
         menuService.showMainMenu(chatId);
 
         ArgumentCaptor<SendMessage> argumentCaptor = ArgumentCaptor.forClass(SendMessage.class);
-        verify(bot,times(1)).execute(argumentCaptor.capture());
+        verify(bot, times(1)).execute(argumentCaptor.capture());
+        SendMessage actualMessage = argumentCaptor.getValue();
+
+        Assertions.assertThat(actualMessage.getParameters().get("chat_id")).isEqualTo(chatId);
+        Assertions.assertThat(actualMessage.getParameters().get("text")).isEqualTo("Правет Друг! Выбери приют:");
+
+    }
+
+    @Test
+    public void showMainMenuForVolunteer() {
+        when(volunteerService.isVolunteer(chatId)).thenReturn(true);
+        menuService.showMainMenu(chatId);
+
+        ArgumentCaptor<SendMessage> argumentCaptor = ArgumentCaptor.forClass(SendMessage.class);
+        verify(bot, times(1)).execute(argumentCaptor.capture());
         SendMessage actualMessage = argumentCaptor.getValue();
 
         Assertions.assertThat(actualMessage.getParameters().get("chat_id")).isEqualTo(chatId);
@@ -79,7 +95,7 @@ class MenuServiceTest {
         menuService.showVolunteerMenu(chatId);
 
         ArgumentCaptor<SendMessage> argumentCaptor = ArgumentCaptor.forClass(SendMessage.class);
-        verify(bot,times(1)).execute(argumentCaptor.capture());
+        verify(bot, times(1)).execute(argumentCaptor.capture());
         SendMessage actualMessage = argumentCaptor.getValue();
 
         Assertions.assertThat(actualMessage.getParameters().get("chat_id")).isEqualTo(chatId);
@@ -108,7 +124,7 @@ class MenuServiceTest {
         menuService.showShelterMenu(chatId);
 
         ArgumentCaptor<SendMessage> argumentCaptor = ArgumentCaptor.forClass(SendMessage.class);
-        verify(bot,times(1)).execute(argumentCaptor.capture());
+        verify(bot, times(1)).execute(argumentCaptor.capture());
         SendMessage actualMessage = argumentCaptor.getValue();
 
         Assertions.assertThat(actualMessage.getParameters().get("chat_id")).isEqualTo(chatId);
@@ -137,7 +153,7 @@ class MenuServiceTest {
         menuService.showShelterInfoMenu(chatId);
 
         ArgumentCaptor<SendMessage> argumentCaptor = ArgumentCaptor.forClass(SendMessage.class);
-        verify(bot,times(1)).execute(argumentCaptor.capture());
+        verify(bot, times(1)).execute(argumentCaptor.capture());
         SendMessage actualMessage = argumentCaptor.getValue();
 
         Assertions.assertThat(actualMessage.getParameters().get("chat_id")).isEqualTo(chatId);
@@ -174,16 +190,44 @@ class MenuServiceTest {
     @MethodSource("provideParametersShowAnimalAdoptionPass")
     public void showAnimalAdoptionMenuPass(Long chatId, AnimalType type) {
         String expectedString = "Информация о том как взять и заботиться о " +
-                (type == AnimalType.CAT?"кошке":"собаке");
+                (type == AnimalType.CAT ? "кошке" : "собаке");
 
         menuService.showAnimalAdoptionMenu(chatId, type);
 
         ArgumentCaptor<SendMessage> argumentCaptor = ArgumentCaptor.forClass(SendMessage.class);
-        verify(bot,times(1)).execute(argumentCaptor.capture());
+        verify(bot, times(1)).execute(argumentCaptor.capture());
         SendMessage actualMessage = argumentCaptor.getValue();
 
         Assertions.assertThat(actualMessage.getParameters().get("chat_id")).isEqualTo(chatId);
         Assertions.assertThat(actualMessage.getParameters().get("text")).isEqualTo(expectedString);
+
+    }
+
+    static Stream<Arguments> provideParametersProbationTerms() {
+        return Stream.of(
+                Arguments.of((Long) null),
+                Arguments.of(-1L)
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideParametersProbationTerms")
+    public void showProbationTermsMenuNull(Long chatId) {
+
+        assertNull(menuService.showProbationTermsMenu(chatId));
+    }
+
+    @Test
+    public void showProbationTermsMenuPass() {
+
+        menuService.showProbationTermsMenu(chatId);
+
+        ArgumentCaptor<SendMessage> argumentCaptor = ArgumentCaptor.forClass(SendMessage.class);
+        verify(bot, times(1)).execute(argumentCaptor.capture());
+        SendMessage actualMessage = argumentCaptor.getValue();
+
+        Assertions.assertThat(actualMessage.getParameters().get("chat_id")).isEqualTo(chatId);
+        Assertions.assertThat(actualMessage.getParameters().get("text")).isEqualTo("Выберите действие");
 
     }
 

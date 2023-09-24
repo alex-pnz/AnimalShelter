@@ -239,6 +239,11 @@ public class Constants {
             555-72-11-2 или пишите в телеграмм @BestKinologEver
             """;
 
+    public static String FAIL_PROBATION_TERMS_MESSAGE= """
+            Вы провалили испытательный срок.
+            Вам необходимо вернуть животное в приют вместе со всеми документами в течении 2 дней.
+            """;
+
     // Commands
     public final static String COMMAND_START = "/start";
     public final static String COMMAND_STOP_CHAT = "/stopChat";
@@ -282,6 +287,9 @@ public class Constants {
     public final static String CALLBACK_BEST_KINOLOG_INFO = "showBestKinologInfo";
     public final static String CALLBACK_HANDICAPPED_ANIMAL_HOUSE_INFO = "handicappedAnimalHouseInfo";
     public final static String CALLBACK_ADOPTION_REFUSAL_INFO = "adoptionRefusalInfo";
-
+    public final static String CALLBACK_ADD_30_DAYS = "add30Days";
+    public final static String CALLBACK_ADD_14_DAYS = "add14Days";
+    public final static String CALLBACK_FAIL_PROBATION_TERMS = "failProbationTerms";
+    public final static String CALLBACK_COMPLETE_PROBATION_TERMS = "completeProbationTerms";
 
 }
