@@ -24,15 +24,15 @@ public class MessageService {
     private final Logger logger = LoggerFactory.getLogger(MessageService.class);
 
     private final TelegramBot bot;
-    private final VisitorRepository visitorRepository;
+    private final VisitorService visitorService;
     private final VisitService visitService;
     private final ShelterRepository shelterRepository;
     private final MenuService menuService;
 
-    public MessageService(TelegramBot bot, VisitorRepository visitorRepository, VisitService visitService,
+    public MessageService(TelegramBot bot, VisitorService visitorService, VisitService visitService,
                           ShelterRepository shelterRepository, MenuService menuService) {
         this.bot = bot;
-        this.visitorRepository = visitorRepository;
+        this.visitorService = visitorService;
         this.visitService = visitService;
         this.shelterRepository = shelterRepository;
         this.menuService = menuService;
@@ -91,10 +91,8 @@ public class MessageService {
      * @return AnimalType
      */
     public AnimalType getShelterType(Long chatId) {
-        Visitor visitor = visitorRepository.findByChatId(chatId);
-//        logger.info("Visitor: {} for chat id {}", visitor.getId(), visitor.getChatId());
+        Visitor visitor = visitorService.getVisitorByChatId(chatId);
         Visit visit = visitService.getCurrentVisitByVisitorId(visitor);
-//        logger.info("Visit {} to shelter {}", visit.getId(), visit.getShelter());
         return visit.getShelter().getShelterType();
     }
 
@@ -141,9 +139,9 @@ public class MessageService {
 
         if (message.matches("[0-9]{11}") && message.matches("^[78].+")) {
             if (message.startsWith("8")) message = message.replaceFirst("8", "7");
-            Visitor visitor = visitorRepository.findByChatId(chatId);
+            Visitor visitor = visitorService.getVisitorByChatId(chatId);
             visitor.setPhoneNumber("+" + message);
-            visitorRepository.save(visitor);
+            visitorService.addVisitor(visitor);
             return bot.execute(new SendMessage(chatId, "Номер " + visitor.getPhoneNumber() + " сохранен!"));
         }
 
@@ -165,9 +163,9 @@ public class MessageService {
         message = message.trim();
 
         if (message.matches("[\\w-.]+@[\\w-]+\\.[a-z0-9]+")) {
-            Visitor visitor = visitorRepository.findByChatId(chatId);
+            Visitor visitor = visitorService.getVisitorByChatId(chatId);
             visitor.setEmail(message);
-            visitorRepository.save(visitor);
+            visitorService.addVisitor(visitor);
             return bot.execute(new SendMessage(chatId, "Электронная почта " + visitor.getEmail() + " сохранена!"));
         }
         return bot.execute(new SendMessage(chatId, "К сожалению бот не смог распознать адрес электронной почты. " +
