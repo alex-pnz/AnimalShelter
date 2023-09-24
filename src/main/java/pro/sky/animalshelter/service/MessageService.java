@@ -96,6 +96,11 @@ public class MessageService {
         return visit.getShelter().getShelterType();
     }
 
+    /**
+     * Выводит информацию о мерах безопасности в выбранном приюте
+     *
+     * @param chatId указать номер чата, в который бот отправит сообщение
+     */
     public SendResponse showSafetyMeasures(Long chatId) {
         SendMessage sendMessage;
         AnimalType shelterType = getShelterType(chatId);
@@ -269,6 +274,24 @@ public class MessageService {
     }
 
     /**
+     * Выводит данные по адаптации и содержанию взрослых собак и кошек
+     *
+     * @param chatId указать номер чата, в который бот отправит сообщение
+     */
+    public SendResponse showAdultAnimalInfo(Long chatId) {
+        SendMessage sendMessage;
+        AnimalType shelterType = getShelterType(chatId);
+        if (shelterType == AnimalType.DOG) {
+            sendMessage = new SendMessage(chatId, ADULT_DOG);
+            return bot.execute(sendMessage);
+        } else if (shelterType == AnimalType.CAT) {
+            sendMessage = new SendMessage(chatId, ADULT_CAT);
+            return bot.execute(sendMessage);
+        }
+        return null;
+    }
+
+    /**
      * Отправляет сообщение в указанный чат
      *
      * @param chatId  указать номер чата, в который бот отправит сообщение
@@ -290,5 +313,13 @@ public class MessageService {
                 update.message().chat().id() : update.callbackQuery().from().id(),
                 "This command is not yet supported");
         bot.execute(message);
+    }
+
+    public SendResponse showListOfDocuments(Long chatId) {
+        if (chatId != null && chatId >= 0) {
+            SendMessage sendMessage = new SendMessage(chatId, NECESSARY_DOCUMENTS);
+            return bot.execute(sendMessage);
+        }
+        throw new InvalidChatException();
     }
 }
