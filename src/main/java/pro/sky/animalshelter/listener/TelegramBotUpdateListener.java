@@ -128,7 +128,8 @@ public class TelegramBotUpdateListener implements UpdatesListener {
                     case CALLBACK_HELLO_PET -> messageService.showPetHelloRules(chatId);
                     // case CALLBACK_NECESSARY_PAPERS -> ; // Необходимые документы
                     case CALLBACK_TRANSPORT_ANIMAL_INFO -> messageService.showPetTransportRules(chatId);
-                    //case CALLBACK_KITTEN_HOUSE_INFO -> ; // Дом для котенка
+                    case CALLBACK_KITTEN_HOUSE_INFO -> messageService.showKittenPuppyInfo(chatId); // Дом для котенка
+                    case CALLBACK_PUPPY_HOUSE_INFO -> messageService.showKittenPuppyInfo(chatId); // Дом для щенка
                     //case CALLBACK_CAT_HOUSE_INFO -> ; // Дом для взрослого кота
                     case CALLBACK_DOG_WHISPERER_INFO -> messageService.showDogWhispererInfo(chatId);
                     case CALLBACK_BEST_KINOLOG_INFO -> messageService.showBestKinologInfo(chatId);
