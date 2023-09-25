@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import pro.sky.animalshelter.exception.InvalidChatException;
-import pro.sky.animalshelter.model.AnimalType;
+import pro.sky.animalshelter.model.enums.AnimalType;
 import pro.sky.animalshelter.model.Visit;
 import pro.sky.animalshelter.model.Visitor;
 import pro.sky.animalshelter.repository.ShelterRepository;

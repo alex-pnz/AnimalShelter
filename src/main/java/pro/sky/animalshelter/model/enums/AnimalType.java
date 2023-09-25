@@ -1,4 +1,4 @@
-package pro.sky.animalshelter.model;
+package pro.sky.animalshelter.model.enums;
 
 /**
  * Виды животных, содержащихся в приютах
