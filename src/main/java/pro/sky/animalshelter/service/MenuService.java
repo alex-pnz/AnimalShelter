@@ -121,9 +121,11 @@ public class MenuService {
             if (shelterType == AnimalType.CAT){
                 inlineKeyboardButtonsTemp[0] = new InlineKeyboardButton("Дом для котенка").callbackData("kittenHouseInfo");
                 inlineKeyboardButtonsTemp[1] = new InlineKeyboardButton("Дом для взрослого кота").callbackData("catHouseInfo");
-            } else {
-                inlineKeyboardButtonsTemp[0] = new InlineKeyboardButton("Cоветы от кинологов").callbackData("showDogWhispererInfo");
-                inlineKeyboardButtonsTemp[1] = new InlineKeyboardButton("Связь с кинологом").callbackData("showBestKinologInfo");
+            }
+            if (shelterType == AnimalType.DOG){
+                inlineKeyboardButtonsTemp[0] = new InlineKeyboardButton("Дом для щенка").callbackData("puppyHouseInfo");
+                inlineKeyboardButtonsTemp[1] = new InlineKeyboardButton("Дом для взрослой собаки").callbackData("dogHouseInfo");
+
             }
 
             InlineKeyboardButton[][] inlineKeyboardButtons = {
@@ -133,8 +135,9 @@ public class MenuService {
 
                     inlineKeyboardButtonsTemp,
 
+                    {new InlineKeyboardButton("Cоветы от кинологов").callbackData("showDogWhispererInfo"),
+                            new InlineKeyboardButton("Связь с кинологом").callbackData("showBestKinologInfo")},
                     {new InlineKeyboardButton("Дом для животного с ограниченными возможностями").callbackData("handicappedAnimalHouseInfo")},
-
                     {new InlineKeyboardButton("Причины отказа в выдаче животного").callbackData("adoptionRefusalInfo"),
                             new InlineKeyboardButton("Оставить контактные данные").callbackData("saveVisitorContacts")},
                     {new InlineKeyboardButton("Позвать волонтера").callbackData("callVolunteer"),
