@@ -27,6 +27,8 @@ public class Volunteer {
     @JoinColumn(name = "visitor_id")
     private Visitor visitor;
 
+    private String action;
+
     public Volunteer() {}
 
     public Volunteer(Long id, Long chatId, String firstName, boolean isFree, Visitor visitor) {
@@ -39,6 +41,14 @@ public class Volunteer {
 
     public Long getId() {
         return id;
+    }
+
+    public String getAction() {
+        return action;
+    }
+
+    public void setAction(String action) {
+        this.action = action;
     }
 
     public void setId(Long id) {
