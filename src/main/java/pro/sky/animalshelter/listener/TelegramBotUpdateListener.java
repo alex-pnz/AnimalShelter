@@ -10,10 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import pro.sky.animalshelter.model.Visitor;
-import pro.sky.animalshelter.service.MenuService;
-import pro.sky.animalshelter.service.MessageService;
-import pro.sky.animalshelter.service.VisitService;
-import pro.sky.animalshelter.service.VisitorService;
+import pro.sky.animalshelter.service.*;
 
 import java.util.List;
 
@@ -32,18 +29,20 @@ public class TelegramBotUpdateListener implements UpdatesListener {
     private final VisitorService visitorService;
     private final ChatWithVolunteer chat;
     private final VisitService visitService;
+    private final VolunteerService volunteerService;
     private static final String PHONE_NUMBER_EMAIL_REGEXP = "^[\\d].+|^\\+[\\d].+";
 
 
     public TelegramBotUpdateListener(TelegramBot bot, MenuService menuService, MessageService messageService,
                                      VisitorService visitorService, ChatWithVolunteer chat,
-                                     VisitService visitService) {
+                                     VisitService visitService, VolunteerService volunteerService) {
         this.bot = bot;
         this.menuService = menuService;
         this.messageService = messageService;
         this.visitorService = visitorService;
         this.chat = chat;
         this.visitService = visitService;
+        this.volunteerService = volunteerService;
     }
 
     @PostConstruct
@@ -98,13 +97,25 @@ public class TelegramBotUpdateListener implements UpdatesListener {
 
                     //MainMenu
                     case CALLBACK_MENU_CAT, CALLBACK_MENU_DOG, CALLBACK_BACK_TO_CHOOSE_SHELTER -> menuService.showShelterMenu(chatId);
-                    //case CALLBACK_START_VOLUNTEER_SESSION -> ; // Войти как волонтер
+                    case CALLBACK_START_VOLUNTEER_SESSION -> {
+                        menuService.showVolunteerMenu(chatId);
+                        volunteerService.setVolunteerFree(chatId,true);
+                    } // Войти как волонтер
 
                     // VolunteerMenu
                     //case CALLBACK_CONTACT_ADOPTER -> ; // Связаться с опекуном
                     //case CALLBACK_SEND_ADOPTER_WARNING -> ; // Отправить предупреждение
-                    //case CALLBACK_CHANGE_PROBATION_TERMS -> ; // Изменить состояние испытательного срока
-                    //case CALLBACK_END_VOLUNTEER_SESSION -> ; // Закончить смену
+                    case CALLBACK_CHANGE_PROBATION_TERMS -> menuService.showProbationTermsMenu(chatId) ; // Изменить состояние испытательного срока
+                    case CALLBACK_END_VOLUNTEER_SESSION -> {
+                        volunteerService.setVolunteerFree(chatId,false);
+                        messageService.sendMessage(chatId,"Смена закрыта");
+                    } // Закончить смену
+
+                    //ProbationTermsMenu
+                    //case CALLBACK_ADD_14_DAYS -> ;
+                    //case CALLBACK_ADD_30_DAYS -> ;
+                    //case CALLBACK_COMPLETE_PROBATION_TERMS -> ;
+                    //case CALLBACK_FAIL_PROBATION_TERMS -> ;
 
                     // ShelterMenu
                     case CALLBACK_SHELTER_INFO_MENU -> menuService.showShelterInfoMenu(chatId);

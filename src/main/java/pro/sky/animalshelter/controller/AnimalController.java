@@ -45,7 +45,7 @@ public class AnimalController {
         return Collections.emptyList();
     }
 
-    @PostMapping("/")
+    @PostMapping
     @Operation(
             summary = "Регистрация нового животного при его поступлении в приют",
             description = "Регистрация нового животного при его поступлении в приют"

@@ -93,4 +93,18 @@ class VolunteerServiceTest {
         verify(volunteerRepository, atLeastOnce()).deleteById(volunteerId);
 
     }
+    @Test
+    public void setVolunteerFree() {
+        Volunteer volunteer = new Volunteer(volunteerId,chatId,"Volunteer Test Name", false, null);
+        when(volunteerRepository.findByChatId(chatId)).thenReturn(volunteer);
+        volunteerService.setVolunteerFree(chatId,true);
+        assertTrue(volunteer.isFree());
+    }
+    @Test
+    public void isVolunteerTrue() {
+        Volunteer volunteer = new Volunteer(volunteerId,chatId,"Volunteer Test Name", false, null);
+        when(volunteerRepository.findByChatId(chatId)).thenReturn(volunteer);
+        assertTrue(volunteerService.isVolunteer(chatId));
+    }
+
 }
