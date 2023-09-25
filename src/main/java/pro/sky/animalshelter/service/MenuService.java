@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import pro.sky.animalshelter.model.AnimalType;
 import pro.sky.animalshelter.repository.VolunteerRepository;
 
+import static pro.sky.animalshelter.utils.Constants.*;
+
 @Service
 public class MenuService {
 
@@ -30,8 +32,8 @@ public class MenuService {
             SendMessage sendMessage = new SendMessage(chatId, "Правет Друг! Выбери приют:");
             if(volunteerService.isVolunteer(chatId)){
             InlineKeyboardButton[][] inlineKeyboardButtons = {
-                    {new InlineKeyboardButton("\uD83D\uDC08 Кошки").callbackData("cat"),
-                            new InlineKeyboardButton("\uD83D\uDC15 Собаки").callbackData("dog")},
+                    {new InlineKeyboardButton("\uD83D\uDC08 Кошки").callbackData(CALLBACK_MENU_CAT),
+                            new InlineKeyboardButton("\uD83D\uDC15 Собаки").callbackData(CALLBACK_MENU_DOG)},
                     {new InlineKeyboardButton("Войти как волонтер").callbackData("startVolunteerSession")}
             };
             InlineKeyboardMarkup markupInline = new InlineKeyboardMarkup(inlineKeyboardButtons);
@@ -39,8 +41,8 @@ public class MenuService {
             return bot.execute(sendMessage);
             }else{
                 InlineKeyboardButton[][] inlineKeyboardButtons = {
-                        {new InlineKeyboardButton("\uD83D\uDC08 Кошки").callbackData("cat"),
-                                new InlineKeyboardButton("\uD83D\uDC15 Собаки").callbackData("dog")}
+                        {new InlineKeyboardButton("\uD83D\uDC08 Кошки").callbackData(CALLBACK_MENU_CAT),
+                                new InlineKeyboardButton("\uD83D\uDC15 Собаки").callbackData(CALLBACK_MENU_DOG)}
                 };
                 InlineKeyboardMarkup markupInline = new InlineKeyboardMarkup(inlineKeyboardButtons);
                 sendMessage.replyMarkup(markupInline);
@@ -61,10 +63,10 @@ public class MenuService {
             SendMessage sendMessage = new SendMessage(chatId, "Меню волонтера");
 
             InlineKeyboardButton[][] inlineKeyboardButtons = {
-                    {new InlineKeyboardButton("Связаться с опекуном").callbackData("contactAdopter")},
-                    {new InlineKeyboardButton("Отправить предупреждение").callbackData("sendAdopterWarning")},
-                    {new InlineKeyboardButton("Изменить состояние испытательного срока").callbackData("changeProbationTerms")},
-                    {new InlineKeyboardButton("Закончить смену").callbackData("endVolunteerSession")}
+                    {new InlineKeyboardButton("Связаться с опекуном").callbackData(CALLBACK_CONTACT_ADOPTER)},
+                    {new InlineKeyboardButton("Отправить предупреждение").callbackData(CALLBACK_SEND_ADOPTER_WARNING)},
+                    {new InlineKeyboardButton("Изменить состояние испытательного срока").callbackData(CALLBACK_CHANGE_PROBATION_TERMS)},
+                    {new InlineKeyboardButton("Закончить смену").callbackData(CALLBACK_END_VOLUNTEER_SESSION)}
             };
             InlineKeyboardMarkup markupInline = new InlineKeyboardMarkup(inlineKeyboardButtons);
             sendMessage.replyMarkup(markupInline);
@@ -84,10 +86,10 @@ public class MenuService {
             SendMessage sendMessage = new SendMessage(chatId, "Меню приюта");
 
             InlineKeyboardButton[][] inlineKeyboardButtons = {
-                    {new InlineKeyboardButton("Узнать информацию о приюте").callbackData("shelterInfoMenu")},
-                    {new InlineKeyboardButton("Как взять животное из приюта").callbackData("adoptionInfo")},
-                    {new InlineKeyboardButton("Прислать отчет о питомце").callbackData("sendReportToVolunteer")},
-                    {new InlineKeyboardButton("Позвать волонтера").callbackData("callVolunteer")}
+                    {new InlineKeyboardButton("Узнать информацию о приюте").callbackData(CALLBACK_SHELTER_INFO_MENU)},
+                    {new InlineKeyboardButton("Как взять животное из приюта").callbackData(CALLBACK_ADOPTION_INFO)},
+                    {new InlineKeyboardButton("Прислать отчет о питомце").callbackData(CALLBACK_SEND_REPORT_TO_VOLUNTEER)},
+                    {new InlineKeyboardButton("Позвать волонтера").callbackData(CALLBACK_CALL_VOLUNTEER)}
             };
             InlineKeyboardMarkup markupInline = new InlineKeyboardMarkup(inlineKeyboardButtons);
             sendMessage.replyMarkup(markupInline);
@@ -107,13 +109,13 @@ public class MenuService {
             SendMessage sendMessage = new SendMessage(chatId, "Информация по приюту");
 
             InlineKeyboardButton[][] inlineKeyboardButtons = {
-                    {new InlineKeyboardButton("О приюте").callbackData("shelterInfo"),
-                            new InlineKeyboardButton("Расписание, адрес").callbackData("timetableAndAddress")},
-                    {new InlineKeyboardButton("Пропуск в приют").callbackData("shelterAdmission"),
-                            new InlineKeyboardButton("Техника безопасности").callbackData("safetyRules")},
-                    {new InlineKeyboardButton("Оставить контактные данные").callbackData("saveVisitorContacts"),
-                            new InlineKeyboardButton("Позвать волонтера").callbackData("callVolunteer")},
-                    {new InlineKeyboardButton("Возврат к выбору приюта").callbackData("backToMainMenu")}
+                    {new InlineKeyboardButton("О приюте").callbackData(CALLBACK_SHELTER_INFO),
+                            new InlineKeyboardButton("Расписание, адрес").callbackData(CALLBACK_SCHEDULE_ADDRESS)},
+                    {new InlineKeyboardButton("Пропуск в приют").callbackData(CALLBACK_SHELTER_ADMISSION),
+                            new InlineKeyboardButton("Техника безопасности").callbackData(CALLBACK_SAFETY_RULES)},
+                    {new InlineKeyboardButton("Оставить контактные данные").callbackData(CALLBACK_SAVE_VISITOR_CONTACTS),
+                            new InlineKeyboardButton("Позвать волонтера").callbackData(CALLBACK_CALL_VOLUNTEER)},
+                    {new InlineKeyboardButton("Возврат к выбору приюта").callbackData(CALLBACK_BACK_TO_MAIN_MENU)}
             };
             InlineKeyboardMarkup markupInline = new InlineKeyboardMarkup(inlineKeyboardButtons);
             sendMessage.replyMarkup(markupInline);
@@ -137,26 +139,26 @@ public class MenuService {
             InlineKeyboardButton[] inlineKeyboardButtonsTemp = new InlineKeyboardButton[2]; // Кнопки в меню которые будут меняться в зависимости от типа приюта
 
             if (shelterType == AnimalType.CAT) {
-                inlineKeyboardButtonsTemp[0] = new InlineKeyboardButton("Дом для котенка").callbackData("kittenHouseInfo");
-                inlineKeyboardButtonsTemp[1] = new InlineKeyboardButton("Дом для взрослого кота").callbackData("catHouseInfo");
+                inlineKeyboardButtonsTemp[0] = new InlineKeyboardButton("Дом для котенка").callbackData(CALLBACK_KITTEN_HOUSE_INFO);
+                inlineKeyboardButtonsTemp[1] = new InlineKeyboardButton("Дом для взрослого кота").callbackData(CALLBACK_CAT_HOUSE_INFO);
             } else {
-                inlineKeyboardButtonsTemp[0] = new InlineKeyboardButton("Советы от кинологов").callbackData("showDogWhispererInfo");
-                inlineKeyboardButtonsTemp[1] = new InlineKeyboardButton("Связь с кинологом").callbackData("showBestKinologInfo");
+                inlineKeyboardButtonsTemp[0] = new InlineKeyboardButton("Советы от кинологов").callbackData(CALLBACK_DOG_WHISPERER_INFO);
+                inlineKeyboardButtonsTemp[1] = new InlineKeyboardButton("Связь с кинологом").callbackData(CALLBACK_BEST_KINOLOG_INFO);
             }
 
             InlineKeyboardButton[][] inlineKeyboardButtons = {
-                    {new InlineKeyboardButton("Знакомство с животным").callbackData("helloPetInfo"),
-                            new InlineKeyboardButton("Необходимые документы").callbackData("necessaryPapers")},
-                    {new InlineKeyboardButton("Транспортировка животного").callbackData("transportAnimalInfo")},
+                    {new InlineKeyboardButton("Знакомство с животным").callbackData(CALLBACK_HELLO_PET),
+                            new InlineKeyboardButton("Необходимые документы").callbackData(CALLBACK_NECESSARY_PAPERS)},
+                    {new InlineKeyboardButton("Транспортировка животного").callbackData(CALLBACK_TRANSPORT_ANIMAL_INFO)},
 
                     inlineKeyboardButtonsTemp,
 
-                    {new InlineKeyboardButton("Дом для животного с ограниченными возможностями").callbackData("handicappedAnimalHouseInfo")},
+                    {new InlineKeyboardButton("Дом для животного с ограниченными возможностями").callbackData(CALLBACK_HANDICAPPED_ANIMAL_HOUSE_INFO)},
 
-                    {new InlineKeyboardButton("Причины отказа в выдаче животного").callbackData("adoptionRefusalInfo"),
-                            new InlineKeyboardButton("Оставить контактные данные").callbackData("saveVisitorContacts")},
-                    {new InlineKeyboardButton("Позвать волонтера").callbackData("callVolunteer"),
-                            new InlineKeyboardButton("Возврат к выбору приюта").callbackData("backToMainMenu")},
+                    {new InlineKeyboardButton("Причины отказа в выдаче животного").callbackData(CALLBACK_ADOPTION_REFUSAL_INFO),
+                            new InlineKeyboardButton("Оставить контактные данные").callbackData(CALLBACK_SAVE_VISITOR_CONTACTS)},
+                    {new InlineKeyboardButton("Позвать волонтера").callbackData(CALLBACK_CALL_VOLUNTEER),
+                            new InlineKeyboardButton("Возврат к выбору приюта").callbackData(CALLBACK_BACK_TO_MAIN_MENU)},
             };
             InlineKeyboardMarkup markupInline = new InlineKeyboardMarkup(inlineKeyboardButtons);
             sendMessage.replyMarkup(markupInline);
@@ -170,10 +172,10 @@ public class MenuService {
             SendMessage sendMessage = new SendMessage(chatId, "Выберите действие");
 
             InlineKeyboardButton[][] inlineKeyboardButtons = {
-                    {new InlineKeyboardButton("Добавить 30 дней").callbackData("add30Days")},
-                    {new InlineKeyboardButton("Добавить 14 дней").callbackData("add14Days")},
-                    {new InlineKeyboardButton("Завершить испытательный срок").callbackData("completeProbationTerms")},
-                    {new InlineKeyboardButton("Завалить испытательный срок").callbackData("failProbationTerms")}
+                    {new InlineKeyboardButton("Добавить 30 дней").callbackData(CALLBACK_ADD_30_DAYS)},
+                    {new InlineKeyboardButton("Добавить 14 дней").callbackData(CALLBACK_ADD_14_DAYS)},
+                    {new InlineKeyboardButton("Завершить испытательный срок").callbackData(CALLBACK_FAIL_PROBATION_TERMS)},
+                    {new InlineKeyboardButton("Завалить испытательный срок").callbackData(CALLBACK_COMPLETE_PROBATION_TERMS)}
             };
             InlineKeyboardMarkup markupInline = new InlineKeyboardMarkup(inlineKeyboardButtons);
             sendMessage.replyMarkup(markupInline);
