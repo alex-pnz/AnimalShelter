@@ -3,6 +3,7 @@ package pro.sky.animalshelter.service;
 import org.springframework.stereotype.Service;
 import pro.sky.animalshelter.model.Volunteer;
 import pro.sky.animalshelter.repository.VolunteerRepository;
+
 /**
  * Сервис, отвечающий за работу с волонтерами
  */
@@ -29,4 +30,16 @@ public class VolunteerService {
     public void deleteVolunteer(long id) {
         volunteerRepository.deleteById(id);
     }
+
+    public void setVolunteerFree(Long chatId, boolean state) {
+        Volunteer volunteer = volunteerRepository.findByChatId(chatId);
+        volunteer.setFree(state);
+        volunteerRepository.save(volunteer);
+    }
+
+    public boolean isVolunteer(Long chatId) {
+        Volunteer volunteer = volunteerRepository.findByChatId(chatId);
+        return volunteer != null;
+    }
+
 }

@@ -35,6 +35,10 @@ public class VisitorService {
         return visitor;
     }
 
+    public Visitor getVisitorByChatId(Long chatId) {
+        return repository.findByChatId(chatId);
+    }
+
     /**
      * Метод ищет постетителя в БД через репозиторий
      * @param update
@@ -72,6 +76,10 @@ public class VisitorService {
                 : update.callbackQuery().from().firstName() + " " + update.callbackQuery().from().lastName();
         visitor.setVisitorName(name);
 
+        return repository.save(visitor);
+    }
+
+    public Visitor addVisitor(Visitor visitor) {
         return repository.save(visitor);
     }
 }

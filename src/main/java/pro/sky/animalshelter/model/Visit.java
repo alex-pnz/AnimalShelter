@@ -34,6 +34,11 @@ public class Visit {
         this.visitDate = visitDate;
     }
 
+    public Visit(Shelter shelter, Visitor visitor) {
+        this.shelter = shelter;
+        this.visitor = visitor;
+    }
+
     public Long getId() {
         return id;
     }
