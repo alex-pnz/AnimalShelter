@@ -7,4 +7,5 @@ import pro.sky.animalshelter.model.Adoption;
  * Хранилище сведений об "усыновлении" животных из приютов
  */
 public interface AdoptionRepository extends JpaRepository<Adoption, Long> {
+    public Adoption findByVisitorId(Long id);
 }

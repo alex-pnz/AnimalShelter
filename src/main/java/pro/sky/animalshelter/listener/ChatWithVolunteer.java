@@ -1,27 +1,40 @@
 package pro.sky.animalshelter.listener;
 
+import com.pengrad.telegrambot.response.SendResponse;
 import org.springframework.stereotype.Component;
+import pro.sky.animalshelter.model.Adoption;
 import pro.sky.animalshelter.model.Visitor;
 import pro.sky.animalshelter.model.Volunteer;
+import pro.sky.animalshelter.model.enums.ProbationTermsStatus;
+import pro.sky.animalshelter.repository.AdoptionRepository;
 import pro.sky.animalshelter.repository.VisitorRepository;
 import pro.sky.animalshelter.repository.VolunteerRepository;
 import pro.sky.animalshelter.service.MessageService;
+import pro.sky.animalshelter.service.VolunteerService;
+
+import static pro.sky.animalshelter.utils.Constants.FAIL_PROBATION_TERMS_MESSAGE;
+import static pro.sky.animalshelter.utils.Constants.WARNING_MESSAGE;
+
 /**
  * Сущность, отвечающая за взаимодействие пользователя
  * с волонтером
- *
  */
 @Component
 public class ChatWithVolunteer {
     private final VolunteerRepository volunteerRepository;
     private final VisitorRepository visitorRepository;
     private final MessageService messageService;
+    private final VolunteerService volunteerService;
+    private final AdoptionRepository adoptionRepository;
 
-    public ChatWithVolunteer(VolunteerRepository volunteerRepository, VisitorRepository visitorRepository, MessageService messageService) {
+    public ChatWithVolunteer(VolunteerRepository volunteerRepository, VisitorRepository visitorRepository, MessageService messageService, VolunteerService volunteerService, AdoptionRepository adoptionRepository) {
         this.volunteerRepository = volunteerRepository;
         this.visitorRepository = visitorRepository;
         this.messageService = messageService;
+        this.volunteerService = volunteerService;
+        this.adoptionRepository = adoptionRepository;
     }
+
     /**
      * Поиск свободных волонтеров
      *
@@ -40,6 +53,7 @@ public class ChatWithVolunteer {
             messageService.sendMessage(chatId, "К сожалению сейчас нет свободных волонтеров.");
         }
     }
+
     /**
      * Запуск чата между волонтером и пользователем
      *
@@ -56,11 +70,12 @@ public class ChatWithVolunteer {
         visitor.setVolunteer(volunteer);
         visitorRepository.save(visitor);
 
-        messageService.sendMessage(chatId, "С вами будет общаться " + volunteer.getFirstName());
+        messageService.sendMessage(chatId, "С вами будет общаться " + volunteer.getFirstName() + "\nЧтобы завершить в чат введите команду /stopChat");
         messageService.sendMessage(volunteer.getChatId(),
                 "Посетитель нуждается в вашей помощи! Его имя - " + visitor.getVisitorName());
 
     }
+
     /**
      * Остановка чата между волонтером и пользователем
      *
@@ -92,6 +107,7 @@ public class ChatWithVolunteer {
                 "Чат с посетителем завершен");
 
     }
+
     /**
      * Проверка находится ли волонтер в чате с пользователем
      *
@@ -99,11 +115,12 @@ public class ChatWithVolunteer {
      */
     public boolean checkVolunteer(Long chatId) {
         Volunteer volunteer = volunteerRepository.findByChatId(chatId);
-        if (volunteer != null) {
+        if (volunteer != null && volunteer.getVisitor() != null) {
             return !volunteer.isFree();
         }
         return false;
     }
+
     /**
      * Проверка находится ли пользователь в чате с волонтером
      *
@@ -116,6 +133,7 @@ public class ChatWithVolunteer {
         }
         return false;
     }
+
     /**
      * Пересылка сообщений между пользователем и волонтером
      *
@@ -132,6 +150,7 @@ public class ChatWithVolunteer {
             sendMessageToVisitor(volunteerId, message);
         }
     }
+
     /**
      * Отправка сообщения волонтеру
      *
@@ -143,6 +162,7 @@ public class ChatWithVolunteer {
         Long volunteerId = volunteer.getChatId();
         messageService.sendMessage(volunteerId, message);
     }
+
     /**
      * Отправка сообщения пользователю
      *
@@ -153,6 +173,49 @@ public class ChatWithVolunteer {
         Visitor visitor = volunteer.getVisitor();
         Long visitorId = visitor.getChatId();
         messageService.sendMessage(visitorId, message);
+    }
+
+    public SendResponse doAction(Long volunteerChatId, Long visitorChatId) {
+        Volunteer volunteer = volunteerRepository.findByChatId(volunteerChatId);
+        Adoption adoption = findAdoption(visitorChatId);
+        String action = volunteer.getAction();
+        String text = "";
+        switch (action) {
+            case "add30Days" -> {
+                int days = adoption.getReportsRequired();
+                adoption.setReportsRequired(days + 30);
+                text = "К вашему испытательному сроку было добавлено 30 дней.";
+            }
+            case "add14Days" -> {
+                int days = adoption.getReportsRequired();
+                adoption.setReportsRequired(days + 14);
+                text = "К вашему испытательному сроку было добавлено 14 дней.";
+            }
+            case "failProbationTerms" -> {
+                adoption.setStatus(ProbationTermsStatus.FAIL);
+                text = FAIL_PROBATION_TERMS_MESSAGE;
+
+            }
+            case "completeProbationTerms" -> {
+                adoption.setStatus(ProbationTermsStatus.COMPLETE);
+                text = "Поздравляем! Вы успешно завершили испытательный срок";
+            }
+            case "sendWarningMessage" -> {
+                text = WARNING_MESSAGE;
+            }
+            case "callVisitor" -> {
+                startChat(visitorChatId, volunteer);
+            }
+        }
+        adoptionRepository.save(adoption);
+        volunteerService.saveAction(volunteerChatId, null);
+        return messageService.sendMessage(visitorChatId, text);
+    }
+
+    public Adoption findAdoption(Long chatId) {
+        Visitor visitor = visitorRepository.findByChatId(chatId);
+        Long visitorId = visitor.getId();
+        return adoptionRepository.findByVisitorId(visitorId);
     }
 
 }

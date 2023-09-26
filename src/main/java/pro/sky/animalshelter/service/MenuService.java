@@ -5,8 +5,7 @@ import com.pengrad.telegrambot.model.request.*;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.response.SendResponse;
 import org.springframework.stereotype.Service;
-import pro.sky.animalshelter.model.AnimalType;
-import pro.sky.animalshelter.repository.VolunteerRepository;
+import pro.sky.animalshelter.model.enums.AnimalType;
 
 import static pro.sky.animalshelter.utils.Constants.*;
 

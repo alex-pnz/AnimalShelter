@@ -3,7 +3,7 @@ package pro.sky.animalshelter.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import pro.sky.animalshelter.model.AnimalType;
+import pro.sky.animalshelter.model.enums.AnimalType;
 import pro.sky.animalshelter.model.Shelter;
 import pro.sky.animalshelter.repository.ShelterRepository;
 

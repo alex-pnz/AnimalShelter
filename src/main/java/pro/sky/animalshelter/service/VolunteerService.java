@@ -41,5 +41,13 @@ public class VolunteerService {
         Volunteer volunteer = volunteerRepository.findByChatId(chatId);
         return volunteer != null;
     }
-
+    public void saveAction(Long chatId, String action) {
+        Volunteer volunteer = volunteerRepository.findByChatId(chatId);
+        volunteer.setAction(action);
+        volunteerRepository.save(volunteer);
+    }
+    public boolean isAction(Long chatId){
+        Volunteer volunteer = volunteerRepository.findByChatId(chatId);
+        return volunteer.getAction() != null;
+    }
 }

@@ -1,6 +1,7 @@
 package pro.sky.animalshelter.model;
 
 import jakarta.persistence.*;
+import pro.sky.animalshelter.model.enums.AnimalType;
 
 import java.time.LocalTime;
 import java.util.List;
@@ -35,8 +36,8 @@ public class Shelter {
 
     private LocalTime closingTime;
 
-    @OneToMany
-    private List<Animal> animalsInShelter;
+   // @OneToMany
+    //private List<Animal> animalsInShelter;
 
     public Long getId() {
         return id;
