@@ -122,7 +122,7 @@ public class MessageService {
      * @param message передает номер телефона для обработки
      */
     public SendResponse saveContactsPhoneNumber(Long chatId, String message) {
-        if (chatId == null || chatId < 0){
+        if (chatId == null || chatId < 0) {
             throw new InvalidChatException();
         }
 
@@ -162,7 +162,7 @@ public class MessageService {
      * @param message передает адрес электронной почты для обработки
      */
     public SendResponse saveContactsEmail(Long chatId, String message) {
-        if (chatId == null || chatId < 0){
+        if (chatId == null || chatId < 0) {
             throw new InvalidChatException();
         }
         message = message.trim();
@@ -216,6 +216,17 @@ public class MessageService {
      */
     public SendResponse showRefusePolicy(Long chatId) {
         SendMessage sendMessage = new SendMessage(chatId, REFUSE_POLICY);
+
+        return bot.execute(sendMessage);
+    }
+
+    /**
+     * Выводит советы по уходу животных с ограниченными возможностями
+     *
+     * @param chatId указать номер чата, в который бот отправит сообщение
+     */
+    public SendResponse houseForAnimalWithDisabilities(Long chatId) {
+        SendMessage sendMessage = new SendMessage(chatId, PET_DISABILITY);
 
         return bot.execute(sendMessage);
     }
@@ -322,4 +333,5 @@ public class MessageService {
         }
         throw new InvalidChatException();
     }
+
 }

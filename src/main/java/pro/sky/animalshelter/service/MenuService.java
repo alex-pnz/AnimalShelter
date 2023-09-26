@@ -138,11 +138,15 @@ public class MenuService {
             InlineKeyboardButton[] inlineKeyboardButtonsTemp = new InlineKeyboardButton[2]; // Кнопки в меню которые будут меняться в зависимости от типа приюта
 
             if (shelterType == AnimalType.CAT) {
-                inlineKeyboardButtonsTemp[0] = new InlineKeyboardButton("Дом для котенка").callbackData(CALLBACK_KITTEN_HOUSE_INFO);
-                inlineKeyboardButtonsTemp[1] = new InlineKeyboardButton("Дом для взрослого кота").callbackData(CALLBACK_CAT_HOUSE_INFO);
-            } else {
-                inlineKeyboardButtonsTemp[0] = new InlineKeyboardButton("Советы от кинологов").callbackData(CALLBACK_DOG_WHISPERER_INFO);
-                inlineKeyboardButtonsTemp[1] = new InlineKeyboardButton("Связь с кинологом").callbackData(CALLBACK_BEST_KINOLOG_INFO);
+
+                inlineKeyboardButtonsTemp[0] = new InlineKeyboardButton("Дом для котенка").callbackData("kittenHouseInfo");
+                inlineKeyboardButtonsTemp[1] = new InlineKeyboardButton("Дом для взрослого кота").callbackData("catHouseInfo");
+            }
+            if (shelterType == AnimalType.DOG){
+                inlineKeyboardButtonsTemp[0] = new InlineKeyboardButton("Дом для щенка").callbackData("puppyHouseInfo");
+                inlineKeyboardButtonsTemp[1] = new InlineKeyboardButton("Дом для взрослой собаки").callbackData("dogHouseInfo");
+
+
             }
 
             InlineKeyboardButton[][] inlineKeyboardButtons = {
@@ -152,12 +156,15 @@ public class MenuService {
 
                     inlineKeyboardButtonsTemp,
 
-                    {new InlineKeyboardButton("Дом для животного с ограниченными возможностями").callbackData(CALLBACK_HANDICAPPED_ANIMAL_HOUSE_INFO)},
 
-                    {new InlineKeyboardButton("Причины отказа в выдаче животного").callbackData(CALLBACK_ADOPTION_REFUSAL_INFO),
-                            new InlineKeyboardButton("Оставить контактные данные").callbackData(CALLBACK_SAVE_VISITOR_CONTACTS)},
-                    {new InlineKeyboardButton("Позвать волонтера").callbackData(CALLBACK_CALL_VOLUNTEER),
-                            new InlineKeyboardButton("Возврат к выбору приюта").callbackData(CALLBACK_BACK_TO_MAIN_MENU)},
+                    {new InlineKeyboardButton("Cоветы от кинологов").callbackData("showDogWhispererInfo"),
+                            new InlineKeyboardButton("Связь с кинологом").callbackData("showBestKinologInfo")},
+                    {new InlineKeyboardButton("Дом для животного с ограниченными возможностями").callbackData("handicappedAnimalHouseInfo")},
+                    {new InlineKeyboardButton("Причины отказа в выдаче животного").callbackData("adoptionRefusalInfo"),
+                            new InlineKeyboardButton("Оставить контактные данные").callbackData("saveVisitorContacts")},
+                    {new InlineKeyboardButton("Позвать волонтера").callbackData("callVolunteer"),
+                            new InlineKeyboardButton("Возврат к выбору приюта").callbackData("backToMainMenu")},
+
             };
             InlineKeyboardMarkup markupInline = new InlineKeyboardMarkup(inlineKeyboardButtons);
             sendMessage.replyMarkup(markupInline);
