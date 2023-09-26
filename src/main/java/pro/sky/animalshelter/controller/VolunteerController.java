@@ -22,7 +22,7 @@ public class VolunteerController {
         this.volunteerService = volunteerService;
     }
 
-    @GetMapping("{id}")
+    @GetMapping("/{id}")
     @Operation(
             summary = "Получение информации о волонтере по его идентификатору",
             description = "Получение информации о волонтере по его идентификатору"
@@ -57,7 +57,7 @@ public class VolunteerController {
         return ResponseEntity.ok(foundVolunteer);
     }
 
-    @DeleteMapping("{id}")
+    @DeleteMapping("/{id}")
     @Operation(
             summary = "Удаление волонтера по его идентификатору",
             description = "Удаление волонтера по его идентификатору"

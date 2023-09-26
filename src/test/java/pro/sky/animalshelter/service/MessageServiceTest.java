@@ -40,28 +40,15 @@ class MessageServiceTest {
     @Mock
     private VisitService visitService;
     @Mock
+    private VisitorService visitorService;
+    @Mock
     private TelegramBot bot;
     @InjectMocks
     private MessageService messageService;
 
     private final Long chatId = 123L;
 
-//    @BeforeEach
-//    public void beforeEach() {
-//        Mockito.when(bot.execute(any())).thenReturn(
-//                BotUtils.fromJson(
-//                        """
-//                            {
-//                              "ok": true
-//                            }
-//                            """,
-//                        SendResponse.class
-//                )
-//        );
-//    }
-
     // testing showSecurityInfo
-
     static Stream<Arguments> provideParametersShowSecurityInfoNull() {
         return Stream.of(
                 Arguments.of((Long) null),
@@ -97,8 +84,7 @@ class MessageServiceTest {
         Shelter catShelter = new Shelter();
         catShelter.setShelterType(AnimalType.CAT);
 
-        when(visitorRepository.findByChatId(chatId)).thenReturn(visitor);
-        when(visitService.getCurrentVisitByVisitorId(visitor)).thenReturn(
+        when(visitService.getCurrentVisitByVisitorId(any())).thenReturn(
                 new Visit(1L, catShelter,visitor, LocalDate.now()));
 
         messageService.showInfoAboutShelter(chatId);
@@ -117,8 +103,7 @@ class MessageServiceTest {
         Shelter dogShelter = new Shelter();
         dogShelter.setShelterType(AnimalType.DOG);
 
-        when(visitorRepository.findByChatId(chatId)).thenReturn(visitor);
-        when(visitService.getCurrentVisitByVisitorId(visitor)).thenReturn(
+        when(visitService.getCurrentVisitByVisitorId(any())).thenReturn(
                 new Visit(1L, dogShelter,visitor, LocalDate.now()));
 
         messageService.showInfoAboutShelter(chatId);
@@ -135,9 +120,8 @@ class MessageServiceTest {
     public void showInfoAboutNullShelter() {
         Visitor visitor = new Visitor(chatId, "Test Name", null, null);
         Shelter shelter = new Shelter();
-        when(visitorRepository.findByChatId(chatId)).thenReturn(visitor);
-        when(visitService.getCurrentVisitByVisitorId(visitor)).thenReturn(
-                new Visit(1L, shelter,visitor, LocalDate.now()));
+        when(visitService.getCurrentVisitByVisitorId(any())).thenReturn(
+                new Visit(1L, shelter, visitor, LocalDate.now()));
         assertNull(messageService.showInfoAboutShelter(chatId));
     }
 
@@ -176,8 +160,7 @@ class MessageServiceTest {
         Shelter dogShelter = new Shelter();
         dogShelter.setShelterType(AnimalType.DOG);
 
-        when(visitorRepository.findByChatId(chatId)).thenReturn(visitor);
-        when(visitService.getCurrentVisitByVisitorId(visitor)).thenReturn(
+        when(visitService.getCurrentVisitByVisitorId(any())).thenReturn(
                 new Visit(1L, dogShelter,visitor, LocalDate.now()));
 
         messageService.showSafetyMeasures(chatId);
@@ -196,8 +179,7 @@ class MessageServiceTest {
         Shelter catShelter = new Shelter();
         catShelter.setShelterType(AnimalType.CAT);
 
-        when(visitorRepository.findByChatId(chatId)).thenReturn(visitor);
-        when(visitService.getCurrentVisitByVisitorId(visitor)).thenReturn(
+        when(visitService.getCurrentVisitByVisitorId(any())).thenReturn(
                 new Visit(1L, catShelter,visitor, LocalDate.now()));
 
         messageService.showSafetyMeasures(chatId);
@@ -208,6 +190,15 @@ class MessageServiceTest {
 
         assertThat(actual.getParameters().get("chat_id")).isEqualTo(chatId);
         assertThat(actual.getParameters().get("text")).isEqualTo(CAT_SHELTER_SAFETY);
+    }
+
+    @Test
+    public void showSafetyMeasuresNull() {
+        Visit visit = new Visit();
+        visit.setShelter(new Shelter());
+        when(visitService.getCurrentVisitByVisitorId(any())).thenReturn(visit);
+        messageService.showSafetyMeasures(chatId);
+        verify(bot, never()).execute(any());
     }
 
     @Test
@@ -285,7 +276,7 @@ class MessageServiceTest {
     @ParameterizedTest
     @MethodSource("provideParametersSaveContactsPhoneNumberWrongNumber")
     public void saveContactsPhoneNumberWrongNumber(String message) {
-        when(visitorRepository.findByChatId(chatId)).thenReturn(new Visitor(chatId, "Test Name", null, null));
+        when(visitorService.getVisitorByChatId(chatId)).thenReturn(new Visitor(chatId, "Test Name", null, null));
 
         messageService.saveContactsPhoneNumber(chatId, message);
 
@@ -298,7 +289,7 @@ class MessageServiceTest {
                 "(/add_contacts - попробовать ввести еще раз)");
 
         ArgumentCaptor<Visitor> argumentCaptorVisitor = ArgumentCaptor.forClass(Visitor.class);
-        verify(visitorRepository, times(1)).save(argumentCaptorVisitor.capture());
+        verify(visitorService, times(1)).addVisitor(argumentCaptorVisitor.capture());
         Visitor actualVisitor = argumentCaptorVisitor.getValue();
 
         assertThat(actualVisitor.getVisitorName()).isEqualTo("Test Name");
@@ -322,7 +313,7 @@ class MessageServiceTest {
     @ParameterizedTest
     @MethodSource("provideParametersSaveContactsPhoneNumberPass")
     public void saveContactsPhoneNumberPass(String message, String phoneNumber) {
-        when(visitorRepository.findByChatId(chatId)).thenReturn(new Visitor(chatId, "Test Name", null, null));
+        when(visitorService.getVisitorByChatId(chatId)).thenReturn(new Visitor(chatId, "Test Name", null, null));
 
         messageService.saveContactsPhoneNumber(chatId, message);
 
@@ -334,7 +325,7 @@ class MessageServiceTest {
         assertThat(actual.getParameters().get("text")).isEqualTo("Номер " + phoneNumber + " сохранен!");
 
         ArgumentCaptor<Visitor> argumentCaptorVisitor = ArgumentCaptor.forClass(Visitor.class);
-        verify(visitorRepository, times(2)).save(argumentCaptorVisitor.capture());
+        verify(visitorService, times(2)).addVisitor(argumentCaptorVisitor.capture());
         Visitor actualVisitor = argumentCaptorVisitor.getValue();
 
         assertThat(actualVisitor.getVisitorName()).isEqualTo("Test Name");
@@ -366,13 +357,13 @@ class MessageServiceTest {
     public void saveContactsEmailPass() {
         Visitor expected = new Visitor(chatId, "Test Name", null, "test@test.com");
 
-        when(visitorRepository.findByChatId(chatId)).thenReturn(new Visitor(chatId, "Test Name", null, null));
+        when(visitorService.getVisitorByChatId(chatId)).thenReturn(new Visitor(chatId, "Test Name", null, null));
 
         messageService.saveContactsEmail(chatId, "test@test.com");
 
         ArgumentCaptor<Visitor> argumentCaptor = ArgumentCaptor.forClass(Visitor.class);
 
-        verify(visitorRepository, times(1)).save(argumentCaptor.capture());
+        verify(visitorService, times(1)).addVisitor(argumentCaptor.capture());
 
         Visitor actual = argumentCaptor.getValue();
         Assertions.assertThat(actual.getEmail()).isEqualTo(expected.getEmail());
@@ -473,14 +464,11 @@ class MessageServiceTest {
     @Test
     public void showDogWhispererInfoTest() {
 
-        Visitor visitor = new Visitor(chatId, "Test Name", null, null);
-        visitor.setId(1L);
         Shelter shelter = new Shelter();
         shelter.setShelterType(AnimalType.DOG);
         Visit visit = new Visit();
         visit.setShelter(shelter);
-        when(visitorRepository.findByChatId(chatId)).thenReturn(visitor);
-        when(visitService.getCurrentVisitByVisitorId(visitor)).thenReturn(visit);
+        when(visitService.getCurrentVisitByVisitorId(any())).thenReturn(visit);
 
         messageService.showDogWhispererInfo(chatId);
 
@@ -495,14 +483,11 @@ class MessageServiceTest {
     @Test
     public void showDogWhispererInfoCatTest() {
 
-        Visitor visitor = new Visitor(chatId, "Test Name", null, null);
-        visitor.setId(1L);
         Shelter shelter = new Shelter();
         shelter.setShelterType(AnimalType.CAT);
         Visit visit = new Visit();
         visit.setShelter(shelter);
-        when(visitorRepository.findByChatId(chatId)).thenReturn(visitor);
-        when(visitService.getCurrentVisitByVisitorId(visitor)).thenReturn(visit);
+        when(visitService.getCurrentVisitByVisitorId(any())).thenReturn(visit);
 
         messageService.showDogWhispererInfo(chatId);
 
@@ -517,14 +502,11 @@ class MessageServiceTest {
     @Test
     public void showDogWhispererInfoNullTest() {
 
-        Visitor visitor = new Visitor(chatId, "Test Name", null, null);
-        visitor.setId(1L);
         Shelter shelter = new Shelter();
         shelter.setShelterType(null);
         Visit visit = new Visit();
         visit.setShelter(shelter);
-        when(visitorRepository.findByChatId(chatId)).thenReturn(visitor);
-        when(visitService.getCurrentVisitByVisitorId(visitor)).thenReturn(visit);
+        when(visitService.getCurrentVisitByVisitorId(any())).thenReturn(visit);
 
         assertNull(messageService.showDogWhispererInfo(chatId));
     }
@@ -532,14 +514,11 @@ class MessageServiceTest {
     @Test
     public void showBestKinologInfoTest() {
 
-        Visitor visitor = new Visitor(chatId, "Test Name", null, null);
-        visitor.setId(1L);
         Shelter shelter = new Shelter();
         shelter.setShelterType(AnimalType.DOG);
         Visit visit = new Visit();
         visit.setShelter(shelter);
-        when(visitorRepository.findByChatId(chatId)).thenReturn(visitor);
-        when(visitService.getCurrentVisitByVisitorId(visitor)).thenReturn(visit);
+        when(visitService.getCurrentVisitByVisitorId(any())).thenReturn(visit);
 
         messageService.showBestKinologInfo(chatId);
 
@@ -562,14 +541,11 @@ class MessageServiceTest {
     @MethodSource("provideParametersShowBestKinologInfoCatTest")
     public void showBestKinologInfoCatTest(AnimalType type) {
 
-        Visitor visitor = new Visitor(chatId, "Test Name", null, null);
-        visitor.setId(1L);
         Shelter shelter = new Shelter();
         shelter.setShelterType(type);
         Visit visit = new Visit();
         visit.setShelter(shelter);
-        when(visitorRepository.findByChatId(chatId)).thenReturn(visitor);
-        when(visitService.getCurrentVisitByVisitorId(visitor)).thenReturn(visit);
+        when(visitService.getCurrentVisitByVisitorId(any())).thenReturn(visit);
 
         assertNull(messageService.showBestKinologInfo(chatId));
     }
@@ -644,6 +620,129 @@ class MessageServiceTest {
         assertThat(actual.getParameters().get("chat_id")).isEqualTo(chatId);
         assertThat(actual.getParameters().get("text")).isEqualTo(
                 "This command is not yet supported");
+
+    }
+
+    @Test
+    public void showKittenPuppyInfoPuppyTest() {
+        Visitor visitor = new Visitor(chatId, "Test Name", null, null);
+        Shelter dogShelter = new Shelter();
+        dogShelter.setShelterType(AnimalType.DOG);
+
+        when(visitService.getCurrentVisitByVisitorId(any())).thenReturn(
+                new Visit(1L, dogShelter,visitor, LocalDate.now()));
+
+        messageService.showKittenPuppyInfo(chatId);
+
+        ArgumentCaptor<SendMessage> argumentCaptor = ArgumentCaptor.forClass(SendMessage.class);
+        verify(bot).execute(argumentCaptor.capture());
+        SendMessage actual = argumentCaptor.getValue();
+
+        assertThat(actual.getParameters().get("chat_id")).isEqualTo(chatId);
+        assertThat(actual.getParameters().get("text")).isEqualTo(PUPPY_ADVICE);
+    }
+
+    @Test
+    public void showKittenPuppyInfoKittenTest() {
+        Visitor visitor = new Visitor(chatId, "Test Name", null, null);
+        Shelter catShelter = new Shelter();
+        catShelter.setShelterType(AnimalType.CAT);
+
+        when(visitService.getCurrentVisitByVisitorId(any())).thenReturn(
+                new Visit(1L, catShelter,visitor, LocalDate.now()));
+
+        messageService.showKittenPuppyInfo(chatId);
+
+        ArgumentCaptor<SendMessage> argumentCaptor = ArgumentCaptor.forClass(SendMessage.class);
+        verify(bot).execute(argumentCaptor.capture());
+        SendMessage actual = argumentCaptor.getValue();
+
+        assertThat(actual.getParameters().get("chat_id")).isEqualTo(chatId);
+        assertThat(actual.getParameters().get("text")).isEqualTo(KITTEN_ADVICE);
+    }
+
+    @Test
+    public void showKittenPuppyInfoNull() {
+        Visit visit = new Visit();
+        visit.setShelter(new Shelter());
+        when(visitService.getCurrentVisitByVisitorId(any())).thenReturn(visit);
+        messageService.showKittenPuppyInfo(chatId);
+        verify(bot, never()).execute(any());
+    }
+
+    @Test
+    public void showAdultAnimalInfoPuppyTest() {
+        Visitor visitor = new Visitor(chatId, "Test Name", null, null);
+        Shelter dogShelter = new Shelter();
+        dogShelter.setShelterType(AnimalType.DOG);
+
+        when(visitService.getCurrentVisitByVisitorId(any())).thenReturn(
+                new Visit(1L, dogShelter,visitor, LocalDate.now()));
+
+        messageService.showAdultAnimalInfo(chatId);
+
+        ArgumentCaptor<SendMessage> argumentCaptor = ArgumentCaptor.forClass(SendMessage.class);
+        verify(bot).execute(argumentCaptor.capture());
+        SendMessage actual = argumentCaptor.getValue();
+
+        assertThat(actual.getParameters().get("chat_id")).isEqualTo(chatId);
+        assertThat(actual.getParameters().get("text")).isEqualTo(ADULT_DOG);
+    }
+
+    @Test
+    public void showAdultAnimalInfoKittenTest() {
+        Visitor visitor = new Visitor(chatId, "Test Name", null, null);
+        Shelter catShelter = new Shelter();
+        catShelter.setShelterType(AnimalType.CAT);
+
+        when(visitService.getCurrentVisitByVisitorId(any())).thenReturn(
+                new Visit(1L, catShelter,visitor, LocalDate.now()));
+
+        messageService.showAdultAnimalInfo(chatId);
+
+        ArgumentCaptor<SendMessage> argumentCaptor = ArgumentCaptor.forClass(SendMessage.class);
+        verify(bot).execute(argumentCaptor.capture());
+        SendMessage actual = argumentCaptor.getValue();
+
+        assertThat(actual.getParameters().get("chat_id")).isEqualTo(chatId);
+        assertThat(actual.getParameters().get("text")).isEqualTo(ADULT_CAT);
+    }
+
+    @Test
+    public void showAdultAnimalInfoNull() {
+        Visit visit = new Visit();
+        visit.setShelter(new Shelter());
+        when(visitService.getCurrentVisitByVisitorId(any())).thenReturn(visit);
+        messageService.showAdultAnimalInfo(chatId);
+        verify(bot, never()).execute(any());
+    }
+
+    static Stream<Arguments> provideParametersShowListOfDocumentsFail() {
+        return Stream.of(
+                Arguments.of((Long) null),
+                Arguments.of(-123L)
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideParametersShowListOfDocumentsFail")
+    public void showListOfDocumentsFail(Long chatId) {
+
+        assertThrows(InvalidChatException.class, () -> messageService.showListOfDocuments(chatId));
+
+    }
+
+    @Test
+    public void showListOfDocumentsPass() {
+
+        messageService.showListOfDocuments(chatId);
+
+        ArgumentCaptor<SendMessage> argumentCaptor = ArgumentCaptor.forClass(SendMessage.class);
+        verify(bot).execute(argumentCaptor.capture());
+        SendMessage actual = argumentCaptor.getValue();
+
+        assertThat(actual.getParameters().get("chat_id")).isEqualTo(chatId);
+        assertThat(actual.getParameters().get("text")).isEqualTo(NECESSARY_DOCUMENTS);
 
     }
 }
