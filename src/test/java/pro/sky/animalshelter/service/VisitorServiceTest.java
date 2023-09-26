@@ -138,6 +138,18 @@ class VisitorServiceTest {
         verify(visitorRepository, atLeastOnce()).save(any());
     }
 
+    @Test
+    void getVisitorByChatIdTest() {
+        visitorService.getVisitorByChatId(anyLong());
+        verify(visitorRepository, atLeastOnce()).findByChatId(anyLong());
+    }
+
+    @Test
+    void addVisitorTest() {
+        visitorService.addVisitor(any());
+        verify(visitorRepository, atLeastOnce()).save(any());
+    }
+
     // Вспомогательный метод
     private Update getUpdate(boolean message) {
         String json = null;

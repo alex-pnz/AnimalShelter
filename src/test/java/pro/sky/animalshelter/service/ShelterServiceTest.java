@@ -1,21 +1,18 @@
 package pro.sky.animalshelter.service;
 
-import jdk.dynalink.linker.LinkerServices;
 import org.assertj.core.api.Assertions;
-import org.hibernate.mapping.Selectable;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import pro.sky.animalshelter.model.AnimalType;
+import pro.sky.animalshelter.model.enums.AnimalType;
 import pro.sky.animalshelter.model.Shelter;
 import pro.sky.animalshelter.repository.ShelterRepository;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;

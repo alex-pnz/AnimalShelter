@@ -74,6 +74,9 @@ public class TelegramBotUpdateListener implements UpdatesListener {
                             messageService.defaultHandler(update);
                         }
                     }
+                }else if(volunteerService.isVolunteer(chatId) && volunteerService.isAction(chatId)){
+                    chat.doAction(chatId, Long.valueOf(text));
+
                     //проверка находится ли пользователь в чате с волонтером
                 } else if (chat.checkVisitor(chatId)) {
                     chat.continueChat(chatId, null, text);
@@ -103,8 +106,14 @@ public class TelegramBotUpdateListener implements UpdatesListener {
                     } // Войти как волонтер
 
                     // VolunteerMenu
-                    //case CALLBACK_CONTACT_ADOPTER -> ; // Связаться с опекуном
-                    //case CALLBACK_SEND_ADOPTER_WARNING -> ; // Отправить предупреждение
+                    case CALLBACK_CONTACT_ADOPTER -> {
+                        volunteerService.saveAction(chatId,"callVisitor");
+                        messageService.sendMessage(chatId,"Введите айди пользователя");
+                    } // Связаться с опекуном
+                    case CALLBACK_SEND_ADOPTER_WARNING -> {
+                        volunteerService.saveAction(chatId,"sendWarningMessage");
+                        messageService.sendMessage(chatId,"Введите айди пользователя");
+                    } // Отправить предупреждение
                     case CALLBACK_CHANGE_PROBATION_TERMS -> menuService.showProbationTermsMenu(chatId) ; // Изменить состояние испытательного срока
                     case CALLBACK_END_VOLUNTEER_SESSION -> {
                         volunteerService.setVolunteerFree(chatId,false);
@@ -112,10 +121,22 @@ public class TelegramBotUpdateListener implements UpdatesListener {
                     } // Закончить смену
 
                     //ProbationTermsMenu
-                    //case CALLBACK_ADD_14_DAYS -> ;
-                    //case CALLBACK_ADD_30_DAYS -> ;
-                    //case CALLBACK_COMPLETE_PROBATION_TERMS -> ;
-                    //case CALLBACK_FAIL_PROBATION_TERMS -> ;
+                    case CALLBACK_ADD_14_DAYS -> {
+                        volunteerService.saveAction(chatId,"add14Days");
+                        messageService.sendMessage(chatId,"Введите айди пользователя");
+                    }
+                    case CALLBACK_ADD_30_DAYS -> {
+                        volunteerService.saveAction(chatId,"add30Days");
+                        messageService.sendMessage(chatId,"Введите айди пользователя");
+                    }
+                    case CALLBACK_COMPLETE_PROBATION_TERMS -> {
+                        volunteerService.saveAction(chatId,"completeProbationTerms");
+                        messageService.sendMessage(chatId,"Введите айди пользователя");
+                    }
+                    case CALLBACK_FAIL_PROBATION_TERMS -> {
+                        volunteerService.saveAction(chatId,"failProbationTerms");
+                        messageService.sendMessage(chatId,"Введите айди пользователя");
+                    }
 
                     // ShelterMenu
                     case CALLBACK_SHELTER_INFO_MENU -> menuService.showShelterInfoMenu(chatId);
