@@ -1,6 +1,7 @@
 package pro.sky.animalshelter.model;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDate;
 
@@ -11,7 +12,8 @@ public class Report {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(columnDefinition = "TIMESTAMP")
-    private LocalDate date = LocalDate.now();
+    @CreationTimestamp
+    private LocalDate date;
     private String diet;
     private String behaviour;
     private String overallHealth;

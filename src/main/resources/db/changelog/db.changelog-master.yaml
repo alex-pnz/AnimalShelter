@@ -16,3 +16,4 @@ databaseChangeLog:
   - include:
       file: classpath:db/changelog/changes/008-adding-report-table.sql
 
+
