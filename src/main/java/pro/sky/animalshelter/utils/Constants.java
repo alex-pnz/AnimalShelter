@@ -343,14 +343,25 @@ public class Constants {
             животных производители предлагают специальные ортопедические кровати.
             """;
 
-    public static String FAIL_PROBATION_TERMS_MESSAGE= """
+    public static String FAIL_PROBATION_TERMS_MESSAGE = """
             Вы провалили испытательный срок.
             Вам необходимо вернуть животное в приют вместе со всеми документами в течении 2 дней.
             """;
-public static String WARNING_MESSAGE= """
-        Дорогой усыновитель, мы заметили, что ты заполняешь отчет не так подробно, как необходимо. 
-        Пожалуйста, подойди ответственнее к этому занятию. В противном случае волонтеры приюта будут обязаны самолично проверять условия содержания животного
-        """;
+    public static String WARNING_MESSAGE = """
+            Дорогой усыновитель, мы заметили, что ты заполняешь отчет не так подробно, как необходимо. 
+            Пожалуйста, подойди ответственнее к этому занятию. В противном случае волонтеры приюта будут обязаны самолично проверять условия содержания животного
+            """;
+
+    public static String REPORT_SAMPLE = """
+            Дорогой усыновитель, для прохождения испытательного срока ты должен в тебение ближайших 30 дней
+            каждый день присылать отчет о пребывании своего нового друга у тебя, а также фотографию! Мы будем ждать 
+            отчет каждый день до 21.00. Обрати внимание, что работники приюта могут продлить твой испытательный срок!
+            Отчет присылать по форме:
+            "Отчет о питомце <Кличка>...", он должен включать что и сколько ваш новый питомец поел, какой был стул,
+            была ли рвота, общее состояние. Не стесняйтесь записывать даже самые мельчайшие подробности - чем подробнее
+            будет отчет - тем больше шансов у вас получить нового друга навсегда!
+            К каждому отчету необходимо добавлять фото.
+            """;
     // Commands
     public final static String COMMAND_START = "/start";
     public final static String COMMAND_STOP_CHAT = "/stopChat";
@@ -395,6 +406,7 @@ public static String WARNING_MESSAGE= """
     public final static String CALLBACK_BEST_KINOLOG_INFO = "showBestKinologInfo";
     public final static String CALLBACK_HANDICAPPED_ANIMAL_HOUSE_INFO = "handicappedAnimalHouseInfo";
     public final static String CALLBACK_ADOPTION_REFUSAL_INFO = "adoptionRefusalInfo";
+    public final static String CALLBACK_REPORT_SAMPLE = "reportSample";
     public final static String CALLBACK_ADD_30_DAYS = "add30Days";
     public final static String CALLBACK_ADD_14_DAYS = "add14Days";
     public final static String CALLBACK_FAIL_PROBATION_TERMS = "failProbationTerms";
