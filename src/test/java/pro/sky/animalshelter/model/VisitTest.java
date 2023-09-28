@@ -2,6 +2,7 @@ package pro.sky.animalshelter.model;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
+import pro.sky.animalshelter.model.enums.AnimalType;
 
 import java.time.LocalDate;
 
@@ -24,7 +25,6 @@ class VisitTest {
         Assertions.assertThat(actualVisit.getShelter()).isEqualTo(expectedShelter);
         Assertions.assertThat(actualVisit.getVisitor()).isEqualTo(expectedVisitor);
         Assertions.assertThat(actualVisit.getVisitDate()).isEqualTo(visitDate);
-
     }
 
     @Test

@@ -742,6 +742,19 @@ class MessageServiceTest {
 
         assertThat(actual.getParameters().get("chat_id")).isEqualTo(chatId);
         assertThat(actual.getParameters().get("text")).isEqualTo(NECESSARY_DOCUMENTS);
-
     }
+
+    @Test
+    public void testHouseForAnimalWithDisabilities() {
+        messageService.houseForAnimalWithDisabilities(chatId);
+
+        ArgumentCaptor<SendMessage> argumentCaptor = ArgumentCaptor.forClass(SendMessage.class);
+        verify(bot).execute(argumentCaptor.capture());
+        SendMessage actual = argumentCaptor.getValue();
+
+        assertThat(actual.getParameters().get("chat_id")).isEqualTo(chatId);
+        assertThat(actual.getParameters().get("text")).isEqualTo(PET_DISABILITY);
+    }
+
+
 }

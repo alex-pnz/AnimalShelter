@@ -3,24 +3,34 @@ package pro.sky.animalshelter.listener;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.response.SendResponse;
+import org.checkerframework.checker.units.qual.A;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import pro.sky.animalshelter.model.Adoption;
 import pro.sky.animalshelter.model.Visitor;
 import pro.sky.animalshelter.model.Volunteer;
+import pro.sky.animalshelter.model.enums.Action;
+import pro.sky.animalshelter.repository.AdoptionRepository;
 import pro.sky.animalshelter.repository.VisitorRepository;
 import pro.sky.animalshelter.repository.VolunteerRepository;
 import pro.sky.animalshelter.service.MessageService;
+import pro.sky.animalshelter.service.VolunteerService;
+
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
-import static pro.sky.animalshelter.utils.Constants.SECURITY_CONTACT_INFO;
+import static pro.sky.animalshelter.model.enums.Action.*;
+import static pro.sky.animalshelter.utils.Constants.*;
 
 @ExtendWith(MockitoExtension.class)
 class ChatWithVolunteerTest {
@@ -31,6 +41,10 @@ class ChatWithVolunteerTest {
     private VisitorRepository visitorRepository;
     @Mock
     private MessageService messageService;
+    @Mock
+    private AdoptionRepository adoptionRepository;
+    @Mock
+    private VolunteerService volunteerService;
     @Mock
     private TelegramBot bot;
     @InjectMocks
@@ -198,5 +212,82 @@ class ChatWithVolunteerTest {
         String actual = argumentCaptor.getValue();
 
         assertThat(actual).isEqualTo("Test Message");
+    }
+
+    static Stream<Arguments> provideParametersDoAction() {
+        return Stream.of(
+                Arguments.of(ADD_30_DAYS, "К вашему испытательному сроку было добавлено 30 дней."),
+                Arguments.of(ADD_14_DAYS, "К вашему испытательному сроку было добавлено 14 дней."),
+                Arguments.of(FAIL_PROBATION_TERMS, FAIL_PROBATION_TERMS_MESSAGE),
+                Arguments.of(COMPLETE_PROBATION_TERMS, "Поздравляем! Вы успешно завершили испытательный срок"),
+                Arguments.of(SEND_WARNING_MESSAGE, WARNING_MESSAGE)
+
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideParametersDoAction")
+    void doAction(Action action, String text) {
+        Volunteer volunteer = new Volunteer();
+        volunteer.setAction(action);
+        when(volunteerRepository.findByChatId(anyLong())).thenReturn(volunteer);
+        Visitor visitor = new Visitor();
+        visitor.setId(1L);
+        when(visitorRepository.findByChatId(anyLong())).thenReturn(visitor);
+        when(adoptionRepository.findByVisitorId(anyLong())).thenReturn(new Adoption());
+
+        chatWithVolunteer.doAction(1L,"1");
+        ArgumentCaptor<String> argumentCaptor = ArgumentCaptor.forClass(String.class);
+        verify(messageService, atLeastOnce()).sendMessage(any(), argumentCaptor.capture());
+        String actualText = argumentCaptor.getValue();
+        assertThat(actualText).isEqualTo(text);
+    }
+
+    @Test
+    void doActionCallVisitor() {
+        Volunteer volunteer = new Volunteer();
+        volunteer.setAction(CALL_VISITOR);
+        when(volunteerRepository.findByChatId(anyLong())).thenReturn(volunteer);
+        Visitor visitor = new Visitor();
+        visitor.setId(1L);
+        when(visitorRepository.findByChatId(anyLong())).thenReturn(visitor);
+        when(adoptionRepository.findByVisitorId(anyLong())).thenReturn(new Adoption());
+
+        chatWithVolunteer.doAction(1L,"1");
+        verify(adoptionRepository, atLeastOnce()).save(any());
+    }
+
+    @Test
+    void doAction() {
+        chatWithVolunteer.doAction(1L,"a");
+        ArgumentCaptor<String> argumentCaptor = ArgumentCaptor.forClass(String.class);
+        verify(messageService, atLeastOnce()).sendMessage(any(), argumentCaptor.capture());
+        String actualText = argumentCaptor.getValue();
+        assertThat(actualText).isEqualTo("Некорректный id пользователя, попробуйте еще раз.");
+    }
+
+    @Test
+    void findAdoption() {
+        Visitor visitor = new Visitor();
+        visitor.setId(1L);
+
+        when(visitorRepository.findByChatId(chatId)).thenReturn(visitor);
+        when(adoptionRepository.findByVisitorId(any())).thenReturn(new Adoption());
+
+        chatWithVolunteer.findAdoption(chatId);
+        ArgumentCaptor<Long> argumentCaptor = ArgumentCaptor.forClass(Long.class);
+        verify(adoptionRepository, atLeastOnce()).findByVisitorId(argumentCaptor.capture());
+        Long actualId = argumentCaptor.getValue();
+        assertThat(actualId).isEqualTo(1L);
+    }
+
+    @Test
+    void isNumericTrue() {
+        assertTrue(chatWithVolunteer.isNumeric("7"));
+    }
+
+    @Test
+    void isNumericFalse() {
+        assertFalse(chatWithVolunteer.isNumeric("a"));
     }
 }
