@@ -333,5 +333,17 @@ public class MessageService {
         }
         throw new InvalidChatException();
     }
+    /**
+     * Выводит требования по заполнению отчета
+     *
+     * @param chatId указать номер чата, в который бот отправит сообщение
+     */
+    public SendResponse showReportSample(Long chatId) {
+        if (chatId != null && chatId >= 0) {
+            SendMessage sendMessage = new SendMessage(chatId, REPORT_SAMPLE);
+            return bot.execute(sendMessage);
+        }
+        throw new InvalidChatException();
+    }
 
 }

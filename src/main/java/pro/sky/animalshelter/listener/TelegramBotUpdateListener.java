@@ -170,6 +170,7 @@ public class TelegramBotUpdateListener implements UpdatesListener {
                     case CALLBACK_BEST_KINOLOG_INFO -> messageService.showBestKinologInfo(chatId);
                     case CALLBACK_HANDICAPPED_ANIMAL_HOUSE_INFO -> messageService.houseForAnimalWithDisabilities(chatId); // Дом для животного с ограниченными возможностями
                     case CALLBACK_ADOPTION_REFUSAL_INFO -> messageService.showRefusePolicy(chatId);
+                    case CALLBACK_REPORT_SAMPLE -> messageService.showReportSample(chatId); // Пример написания отчета
 
                     default -> messageService.defaultHandler(update);
 
