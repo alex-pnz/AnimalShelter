@@ -173,6 +173,12 @@ public class MenuService {
         return null;
     }
 
+    /**
+     * Выводит меню выбора действия волонтера
+     *
+     * @param chatId указать номер чата, в который бот отправит сообщение
+     * @return для облегчения процесса тестирования метода, возвращаем объект класса SendResponse
+     */
     public SendResponse showProbationTermsMenu(Long chatId) {
         if (chatId != null && chatId >= 0) {
             SendMessage sendMessage = new SendMessage(chatId, "Выберите действие");

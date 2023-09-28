@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import pro.sky.animalshelter.model.Adoption;
 import pro.sky.animalshelter.model.Visitor;
 import pro.sky.animalshelter.model.Volunteer;
+import pro.sky.animalshelter.model.enums.Action;
 import pro.sky.animalshelter.model.enums.ProbationTermsStatus;
 import pro.sky.animalshelter.repository.AdoptionRepository;
 import pro.sky.animalshelter.repository.VisitorRepository;
@@ -174,48 +175,76 @@ public class ChatWithVolunteer {
         Long visitorId = visitor.getChatId();
         messageService.sendMessage(visitorId, message);
     }
+    /**
+     * Метод отвечающий за выполнение команд волонтера
+     *
+     * @param volunteerChatId
+     * @param visitorChatId
+     */
+    public SendResponse doAction(Long volunteerChatId, String visitorChatId) {
+        String text = "Некорректный id пользователя, попробуйте еще раз.";
+        if(isNumeric(visitorChatId)) {
+            Volunteer volunteer = volunteerRepository.findByChatId(volunteerChatId);
+            Adoption adoption = findAdoption(Long.valueOf(visitorChatId));
+            Action action = volunteer.getAction();
 
-    public SendResponse doAction(Long volunteerChatId, Long visitorChatId) {
-        Volunteer volunteer = volunteerRepository.findByChatId(volunteerChatId);
-        Adoption adoption = findAdoption(visitorChatId);
-        String action = volunteer.getAction();
-        String text = "";
-        switch (action) {
-            case "add30Days" -> {
-                int days = adoption.getReportsRequired();
-                adoption.setReportsRequired(days + 30);
-                text = "К вашему испытательному сроку было добавлено 30 дней.";
-            }
-            case "add14Days" -> {
-                int days = adoption.getReportsRequired();
-                adoption.setReportsRequired(days + 14);
-                text = "К вашему испытательному сроку было добавлено 14 дней.";
-            }
-            case "failProbationTerms" -> {
-                adoption.setStatus(ProbationTermsStatus.FAIL);
-                text = FAIL_PROBATION_TERMS_MESSAGE;
+            switch (action) {
+                case ADD_30_DAYS -> {
+                    int days = adoption.getReportsRequired();
+                    adoption.setReportsRequired(days + 30);
+                    text = "К вашему испытательному сроку было добавлено 30 дней.";
+                }
+                case ADD_14_DAYS -> {
+                    int days = adoption.getReportsRequired();
+                    adoption.setReportsRequired(days + 14);
+                    text = "К вашему испытательному сроку было добавлено 14 дней.";
+                }
+                case FAIL_PROBATION_TERMS -> {
+                    adoption.setStatus(ProbationTermsStatus.FAIL);
+                    text = FAIL_PROBATION_TERMS_MESSAGE;
 
+                }
+                case COMPLETE_PROBATION_TERMS -> {
+                    adoption.setStatus(ProbationTermsStatus.COMPLETE);
+                    text = "Поздравляем! Вы успешно завершили испытательный срок";
+                }
+                case SEND_WARNING_MESSAGE -> {
+                    text = WARNING_MESSAGE;
+                }
+                case CALL_VISITOR -> {
+                    startChat(Long.valueOf(visitorChatId), volunteer);
+                }
             }
-            case "completeProbationTerms" -> {
-                adoption.setStatus(ProbationTermsStatus.COMPLETE);
-                text = "Поздравляем! Вы успешно завершили испытательный срок";
-            }
-            case "sendWarningMessage" -> {
-                text = WARNING_MESSAGE;
-            }
-            case "callVisitor" -> {
-                startChat(visitorChatId, volunteer);
-            }
+            adoptionRepository.save(adoption);
+            volunteerService.saveAction(volunteerChatId, null);
+            return messageService.sendMessage(Long.valueOf(visitorChatId), text);
         }
-        adoptionRepository.save(adoption);
-        volunteerService.saveAction(volunteerChatId, null);
-        return messageService.sendMessage(visitorChatId, text);
+        return messageService.sendMessage(volunteerChatId, text);
     }
-
+    /**
+     * Метод находит информацию об усыновлении по его chatId
+     *
+     * @param chatId
+     * @return Adoption
+     */
     public Adoption findAdoption(Long chatId) {
         Visitor visitor = visitorRepository.findByChatId(chatId);
         Long visitorId = visitor.getId();
         return adoptionRepository.findByVisitorId(visitorId);
+    }
+
+    /**
+     * Проверяет является ли строка числом
+     *
+     * @param str
+     */
+    public static boolean isNumeric(String str) {
+        try {
+            Double.parseDouble(str);
+            return true;
+        } catch(NumberFormatException e){
+            return false;
+        }
     }
 
 }

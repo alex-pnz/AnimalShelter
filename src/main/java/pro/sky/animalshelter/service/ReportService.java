@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import pro.sky.animalshelter.listener.TelegramBotUpdateListener;
 import pro.sky.animalshelter.model.Adoption;
 import pro.sky.animalshelter.model.Report;
+import pro.sky.animalshelter.model.enums.ProbationTermsStatus;
 import pro.sky.animalshelter.repository.AdoptionRepository;
 import pro.sky.animalshelter.repository.ReportRepository;
 
@@ -22,14 +23,13 @@ public class ReportService {
     public static final String REPORT_REMINDER = "Нехороший человек, шли отчет сюда!";
     private final ReportRepository reportRepository;
     private final AdoptionRepository adoptionRepository;
-    private final TelegramBotUpdateListener listener;
+    private final MessageService messageService;
 
     public ReportService(ReportRepository reportRepository,
-                         AdoptionRepository adoptionRepository,
-                         TelegramBotUpdateListener listener) {
+                         AdoptionRepository adoptionRepository, MessageService messageService) {
         this.reportRepository = reportRepository;
         this.adoptionRepository = adoptionRepository;
-        this.listener = listener;
+        this.messageService = messageService;
     }
 
     /**
@@ -38,9 +38,8 @@ public class ReportService {
     @Scheduled(cron = "0 0 19 * * ?")
     public void sendNotification() {
         LocalDate today = LocalDate.now();
-        LocalDate fromDate = today.minusDays(30);
 
-        List<Adoption> adoptions = adoptionRepository.findByAdoptionDateLessThanEqual(fromDate);
+        List<Adoption> adoptions = adoptionRepository.findByStatus(ProbationTermsStatus.IN_PROGRESS);
         List<Report> reports = reportRepository.findReportByDate(today);
 
         for (var adoption : adoptions) {
@@ -52,7 +51,7 @@ public class ReportService {
                 }
             }
             if (!found) {
-                listener.sendGenericMessage(adoption.getVisitor().getChatId(), REPORT_REMINDER);
+                messageService.sendMessage(adoption.getVisitor().getChatId(), REPORT_REMINDER);
             }
         }
     }

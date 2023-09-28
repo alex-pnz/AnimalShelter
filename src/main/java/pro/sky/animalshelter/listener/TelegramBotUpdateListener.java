@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import pro.sky.animalshelter.model.Visitor;
+import pro.sky.animalshelter.model.enums.Action;
 import pro.sky.animalshelter.service.*;
 
 import java.util.List;
@@ -76,7 +77,7 @@ public class TelegramBotUpdateListener implements UpdatesListener {
                         }
                     }
                 }else if(volunteerService.isVolunteer(chatId) && volunteerService.isAction(chatId)){
-                    chat.doAction(chatId, Long.valueOf(text));
+                    chat.doAction(chatId, text);
 
                     //проверка находится ли пользователь в чате с волонтером
                 } else if (chat.checkVisitor(chatId)) {
@@ -108,11 +109,11 @@ public class TelegramBotUpdateListener implements UpdatesListener {
 
                     // VolunteerMenu
                     case CALLBACK_CONTACT_ADOPTER -> {
-                        volunteerService.saveAction(chatId,"callVisitor");
+                        volunteerService.saveAction(chatId, Action.CALL_VISITOR);
                         messageService.sendMessage(chatId,"Введите айди пользователя");
                     } // Связаться с опекуном
                     case CALLBACK_SEND_ADOPTER_WARNING -> {
-                        volunteerService.saveAction(chatId,"sendWarningMessage");
+                        volunteerService.saveAction(chatId,Action.SEND_WARNING_MESSAGE);
                         messageService.sendMessage(chatId,"Введите айди пользователя");
                     } // Отправить предупреждение
                     case CALLBACK_CHANGE_PROBATION_TERMS -> menuService.showProbationTermsMenu(chatId) ; // Изменить состояние испытательного срока
@@ -123,19 +124,19 @@ public class TelegramBotUpdateListener implements UpdatesListener {
 
                     //ProbationTermsMenu
                     case CALLBACK_ADD_14_DAYS -> {
-                        volunteerService.saveAction(chatId,"add14Days");
+                        volunteerService.saveAction(chatId,Action.ADD_14_DAYS);
                         messageService.sendMessage(chatId,"Введите айди пользователя");
                     }
                     case CALLBACK_ADD_30_DAYS -> {
-                        volunteerService.saveAction(chatId,"add30Days");
+                        volunteerService.saveAction(chatId,Action.ADD_30_DAYS);
                         messageService.sendMessage(chatId,"Введите айди пользователя");
                     }
                     case CALLBACK_COMPLETE_PROBATION_TERMS -> {
-                        volunteerService.saveAction(chatId,"completeProbationTerms");
+                        volunteerService.saveAction(chatId,Action.COMPLETE_PROBATION_TERMS);
                         messageService.sendMessage(chatId,"Введите айди пользователя");
                     }
                     case CALLBACK_FAIL_PROBATION_TERMS -> {
-                        volunteerService.saveAction(chatId,"failProbationTerms");
+                        volunteerService.saveAction(chatId,Action.FAIL_PROBATION_TERMS);
                         messageService.sendMessage(chatId,"Введите айди пользователя");
                     }
 
@@ -179,8 +180,4 @@ public class TelegramBotUpdateListener implements UpdatesListener {
         return UpdatesListener.CONFIRMED_UPDATES_ALL;
     }
 
-    public void sendGenericMessage(Long chatId, String text) {
-        SendMessage message = new SendMessage(chatId, text);
-        SendResponse response = bot.execute(message);
-    }
 }
