@@ -135,17 +135,21 @@ public class MenuService {
             SendMessage sendMessage = new SendMessage(chatId, "Информация о том как взять и заботиться о " +
                     (shelterType == AnimalType.CAT ? "кошке" : "собаке"));
 
-            InlineKeyboardButton[] inlineKeyboardButtonsTemp = new InlineKeyboardButton[2]; // Кнопки в меню которые будут меняться в зависимости от типа приюта
+            InlineKeyboardButton[] inlineKeyboardButtonsTemp1 = new InlineKeyboardButton[2]; // Кнопки в меню которые будут меняться в зависимости от типа приюта
+            InlineKeyboardButton[] inlineKeyboardButtonsTemp2 = null; // Кнопки в меню которые будут меняться в зависимости от типа приюта
 
             if (shelterType == AnimalType.CAT) {
 
-                inlineKeyboardButtonsTemp[0] = new InlineKeyboardButton("Дом для котенка").callbackData("kittenHouseInfo");
-                inlineKeyboardButtonsTemp[1] = new InlineKeyboardButton("Дом для взрослого кота").callbackData("catHouseInfo");
+                inlineKeyboardButtonsTemp1[0] = new InlineKeyboardButton("Дом для котенка").callbackData("kittenHouseInfo");
+                inlineKeyboardButtonsTemp1[1] = new InlineKeyboardButton("Дом для взрослого кота").callbackData("catHouseInfo");
+                inlineKeyboardButtonsTemp2 = new InlineKeyboardButton[0];
             }
             if (shelterType == AnimalType.DOG){
-                inlineKeyboardButtonsTemp[0] = new InlineKeyboardButton("Дом для щенка").callbackData("puppyHouseInfo");
-                inlineKeyboardButtonsTemp[1] = new InlineKeyboardButton("Дом для взрослой собаки").callbackData("dogHouseInfo");
-
+                inlineKeyboardButtonsTemp1[0] = new InlineKeyboardButton("Дом для щенка").callbackData("puppyHouseInfo");
+                inlineKeyboardButtonsTemp1[1] = new InlineKeyboardButton("Дом для взрослой собаки").callbackData("dogHouseInfo");
+                inlineKeyboardButtonsTemp2 = new InlineKeyboardButton[2];
+                inlineKeyboardButtonsTemp2[0] = new InlineKeyboardButton("Cоветы от кинологов").callbackData("showDogWhispererInfo");
+                inlineKeyboardButtonsTemp2[1] = new InlineKeyboardButton("Связь с кинологом").callbackData("showBestKinologInfo");
 
             }
 
@@ -154,11 +158,9 @@ public class MenuService {
                             new InlineKeyboardButton("Необходимые документы").callbackData(CALLBACK_NECESSARY_PAPERS)},
                     {new InlineKeyboardButton("Транспортировка животного").callbackData(CALLBACK_TRANSPORT_ANIMAL_INFO)},
 
-                    inlineKeyboardButtonsTemp,
+                    inlineKeyboardButtonsTemp1,
+                    inlineKeyboardButtonsTemp2,
 
-
-                    {new InlineKeyboardButton("Cоветы от кинологов").callbackData("showDogWhispererInfo"),
-                            new InlineKeyboardButton("Связь с кинологом").callbackData("showBestKinologInfo")},
                     {new InlineKeyboardButton("Дом для животного с ограниченными возможностями").callbackData("handicappedAnimalHouseInfo")},
                     {new InlineKeyboardButton("Причины отказа в выдаче животного").callbackData("adoptionRefusalInfo"),
                             new InlineKeyboardButton("Оставить контактные данные").callbackData("saveVisitorContacts")},
