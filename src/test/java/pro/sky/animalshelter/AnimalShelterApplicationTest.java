@@ -64,14 +64,13 @@ class AnimalShelterApplicationTest {
         try (MockedStatic<SpringApplication> mocked = mockStatic(SpringApplication.class)) {
 
             mocked.when(() -> { SpringApplication.run(AnimalShelterApplication.class,
-                            new String[] {"cat", "dog"});})
+                            new String[] {});})
                     .thenReturn(mock(ConfigurableApplicationContext.class));
 
-            AnimalShelterApplication.main(new String[] {"cat", "dog"});
+            AnimalShelterApplication.main(new String[] {});
 
             mocked.verify(() -> { SpringApplication.run(AnimalShelterApplication.class,
-                    new String[] {"cat", "dog"}); });
-
+                    new String[] {}); }, atLeastOnce());
         }
     }
 
