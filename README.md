@@ -39,5 +39,5 @@
 - [x] [Никулица Александр](https://github.com/alex-niculita)
 ---
 ### Документация
-[Animal Shelter Docs](https://github.com/alex-niculita/AnimalShelter/wiki/AnimalShelter-Wiki)
+[Animal Shelter Docs](https://github.com/alex-niculita/AnimalShelter/wiki)
 
