@@ -13,11 +13,12 @@ class ReportTest {
     private final String expectedBehaviour = "Test Behaviour";
     private final String expectedHealth = "Test Health";
     private final Adoption expectedAdoption = new Adoption();
+    private final String expectedImage = "Test/image/path.jpg";
 
     @Test
     public void testReportConstructor() {
         expectedAdoption.setId(1111L);
-        Report actualReport = new Report(123L, expectedDate, expectedDiet, expectedBehaviour, expectedHealth, expectedAdoption);
+        Report actualReport = new Report(123L, expectedDate, expectedDiet, expectedBehaviour, expectedHealth, expectedAdoption, expectedImage);
 
         Assertions.assertThat(actualReport.getId()).isEqualTo(expectedId);
         Assertions.assertThat(actualReport.getDate()).isEqualTo(expectedDate);
