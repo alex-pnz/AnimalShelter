@@ -20,17 +20,20 @@ public class Report {
     @ManyToOne()
     @JoinColumn(name="adoption_id")
     private Adoption adoption;
+    private String image;
 
     public Report() {
     }
 
-    public Report(Long id, LocalDate date, String diet, String behaviour, String overallHealth, Adoption adoption) {
+    public Report(Long id, LocalDate date, String diet, String behaviour,
+                  String overallHealth, Adoption adoption, String image) {
         this.id = id;
         this.date = date;
         this.diet = diet;
         this.behaviour = behaviour;
         this.overallHealth = overallHealth;
         this.adoption = adoption;
+        this.image = image;
     }
 
     public Long getId() {
@@ -79,5 +82,13 @@ public class Report {
 
     public void setAdoption(Adoption adoption) {
         this.adoption = adoption;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 }

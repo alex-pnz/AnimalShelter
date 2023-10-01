@@ -32,12 +32,14 @@ public class TelegramBotUpdateListener implements UpdatesListener {
     private final ChatWithVolunteer chat;
     private final VisitService visitService;
     private final VolunteerService volunteerService;
+    private final ReportService reportService;
     private static final String PHONE_NUMBER_EMAIL_REGEXP = "^[\\d].+|^\\+[\\d].+";
 
 
     public TelegramBotUpdateListener(TelegramBot bot, MenuService menuService, MessageService messageService,
                                      VisitorService visitorService, ChatWithVolunteer chat,
-                                     VisitService visitService, VolunteerService volunteerService) {
+                                     VisitService visitService, VolunteerService volunteerService,
+                                     ReportService reportService) {
         this.bot = bot;
         this.menuService = menuService;
         this.messageService = messageService;
@@ -45,6 +47,7 @@ public class TelegramBotUpdateListener implements UpdatesListener {
         this.chat = chat;
         this.visitService = visitService;
         this.volunteerService = volunteerService;
+        this.reportService = reportService;
     }
 
     @PostConstruct
@@ -59,10 +62,16 @@ public class TelegramBotUpdateListener implements UpdatesListener {
 
             // создаем нового посетителя, если таковой раньше не заходил
             Visitor currentVisitor = visitorService.getVisitor(update);
+//            logger.info("{}", update);
 
             if (update.message() != null) { // Меню InlineKeyboard не передает message, поэтому ловим  callback который передаем в callbackData
                 Long chatId = update.message().chat().id();
                 String text = update.message().text();
+                // если приходит сообщение с картинкой - поле text пустое, сообщение содержится в поле caption
+                // данный костыль нужен, чтобы избежать NullPointerException не переписывая всю логику проверки
+                if (text == null) {
+                    text = "";
+                }
 
                 if (text.startsWith("/")) {
                     switch (text) {
@@ -88,6 +97,14 @@ public class TelegramBotUpdateListener implements UpdatesListener {
                 } else if (text.matches(PHONE_NUMBER_EMAIL_REGEXP) && text.contains("@")) {
                     messageService.saveContactsPhoneNumber(chatId, text);
                     //кнопка "обратно в меню"
+                } else if (isReport(update)){
+                    if (!reportService.checkReport(update)) {
+                        SendMessage msg = new SendMessage(chatId, "Не бреши мне, падла");
+                        bot.execute(msg);
+                    } else {
+                        SendMessage msg = new SendMessage(chatId, "Вот и зашибись");
+                        bot.execute(msg);
+                    }
                 } else {
                     messageService.defaultHandler(update);
                 }
@@ -143,7 +160,10 @@ public class TelegramBotUpdateListener implements UpdatesListener {
                     // ShelterMenu
                     case CALLBACK_SHELTER_INFO_MENU -> menuService.showShelterInfoMenu(chatId);
                     case CALLBACK_ADOPTION_INFO -> menuService.showAnimalAdoptionMenu(chatId, messageService.getShelterType(chatId));
-                    //case CALLBACK_SEND_REPORT_TO_VOLUNTEER -> ; // Прислать отчет о питомце
+                    // Прислать отчет о питомце
+                    case CALLBACK_SEND_REPORT_TO_VOLUNTEER -> {
+                        messageService.howToSendReport(chatId);
+                    }
                     case CALLBACK_CALL_VOLUNTEER -> {
                         messageService.showFindVolunteerInfo(chatId);
                         chat.findVolunteer(chatId);
@@ -181,4 +201,11 @@ public class TelegramBotUpdateListener implements UpdatesListener {
         return UpdatesListener.CONFIRMED_UPDATES_ALL;
     }
 
+    private boolean isReport(Update update) {
+        if (update.message().caption() != null && (update.message().caption().startsWith("Отчет")
+                || update.message().caption().startsWith("отчет"))) return true;
+        else if (update.message().text() != null && (update.message().text().startsWith("Отчет")
+                || update.message().text().startsWith("отчет"))) return true;
+        return false;
+    }
 }
