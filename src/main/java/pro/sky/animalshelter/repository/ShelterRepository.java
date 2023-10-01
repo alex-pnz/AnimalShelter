@@ -2,7 +2,6 @@ package pro.sky.animalshelter.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import pro.sky.animalshelter.model.AnimalType;
 import pro.sky.animalshelter.model.Shelter;
 
 import java.util.List;

@@ -7,6 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import pro.sky.animalshelter.model.Volunteer;
+import pro.sky.animalshelter.model.enums.Action;
 import pro.sky.animalshelter.repository.VolunteerRepository;
 
 import java.util.NoSuchElementException;
@@ -106,5 +107,28 @@ class VolunteerServiceTest {
         when(volunteerRepository.findByChatId(chatId)).thenReturn(volunteer);
         assertTrue(volunteerService.isVolunteer(chatId));
     }
+
+    @Test
+    public void saveAction() {
+        Volunteer volunteer = new Volunteer(volunteerId,chatId,"Volunteer Test Name", false, null);
+        when(volunteerRepository.findByChatId(chatId)).thenReturn(volunteer);
+
+        volunteerService.saveAction(chatId, Action.ADD_14_DAYS);
+        verify(volunteerRepository, atLeastOnce()).save(volunteer);
+    }
+    @Test
+    public void isActionTrue(){
+        Volunteer volunteer = new Volunteer(volunteerId,chatId,"Volunteer Test Name", false, null);
+        volunteer.setAction(Action.ADD_14_DAYS);
+        when(volunteerRepository.findByChatId(chatId)).thenReturn(volunteer);
+        assertTrue(volunteerService.isAction(chatId));
+    }
+    @Test
+    public void isActionFalse(){
+        Volunteer volunteer = new Volunteer(volunteerId,chatId,"Volunteer Test Name", false, null);
+        when(volunteerRepository.findByChatId(chatId)).thenReturn(volunteer);
+        assertFalse(volunteerService.isAction(chatId));
+    }
+
 
 }

@@ -1,6 +1,8 @@
 package pro.sky.animalshelter.model;
 
 import jakarta.persistence.*;
+import org.aspectj.util.GenericSignature;
+import pro.sky.animalshelter.model.enums.AnimalType;
 
 import java.time.LocalDate;
 
@@ -8,7 +10,7 @@ import java.time.LocalDate;
  * Класс, описывающий животное в приюте
  */
 @Entity
-@Table(name="animals")
+@Table(name = "animals")
 public class Animal {
 
     @Id
@@ -21,10 +23,14 @@ public class Animal {
     private String name;
 
     private int age;
-
+    @Column(columnDefinition = "TIMESTAMP")
     private LocalDate admissionDate;
-
+    @Column(columnDefinition = "TIMESTAMP")
     private LocalDate leaveDate;
+    @ManyToOne()
+    @JoinColumn(name="shelter_id")
+    private Shelter shelter;
+
 
     public Long getId() {
         return id;
@@ -72,5 +78,13 @@ public class Animal {
 
     public void setLeaveDate(LocalDate leaveDate) {
         this.leaveDate = leaveDate;
+    }
+
+    public Shelter getShelter() {
+        return shelter;
+    }
+
+    public void setShelter(Shelter shelter) {
+        this.shelter = shelter;
     }
 }

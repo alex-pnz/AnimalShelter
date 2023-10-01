@@ -1,6 +1,7 @@
 package pro.sky.animalshelter.model;
 
 import jakarta.persistence.*;
+import pro.sky.animalshelter.model.enums.Action;
 
 import java.util.Objects;
 
@@ -26,6 +27,8 @@ public class Volunteer {
     @OneToOne
     @JoinColumn(name = "visitor_id")
     private Visitor visitor;
+    @Enumerated(EnumType.STRING)
+    private Action action;
 
     public Volunteer() {}
 
@@ -39,6 +42,14 @@ public class Volunteer {
 
     public Long getId() {
         return id;
+    }
+
+    public Action getAction() {
+        return action;
+    }
+
+    public void setAction(Action action) {
+        this.action = action;
     }
 
     public void setId(Long id) {

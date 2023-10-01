@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 import pro.sky.animalshelter.model.Adoption;
+import pro.sky.animalshelter.service.AdoptionService;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -13,6 +14,11 @@ import java.util.Collections;
 @RestController
 @RequestMapping("/api/v1/adoption")
 public class AdoptionController {
+private final AdoptionService adoptionService;
+
+    public AdoptionController(AdoptionService adoptionService) {
+        this.adoptionService = adoptionService;
+    }
 
     @PostMapping("/adopt")
     @Operation(
@@ -21,7 +27,7 @@ public class AdoptionController {
     )
     public Adoption animalAdoption(@RequestBody @Parameter(description = "Сведения передаче животного хозяину")
                                    Adoption adoption) {
-        return adoption;
+        return adoptionService.createAdoption(adoption);
     }
 
     @GetMapping("/show-adoptions")
@@ -30,7 +36,7 @@ public class AdoptionController {
             description = "Получение информации о всех передачах животных новым хозяевам"
     )
     public Collection<Adoption> getAdoptions() {
-        return Collections.emptyList();
+        return adoptionService.allAdoptions();
     }
 
     @GetMapping("/show-adoption/{id}")
@@ -39,6 +45,6 @@ public class AdoptionController {
             description = "Получение информации о передаче животного новым хозяевам по идетификатору"
     )
     public Adoption getAdoptionById(@PathVariable @Parameter(description = "Идентификатор") Long id) {
-        return new Adoption();
+        return adoptionService.findById(id);
     }
 }

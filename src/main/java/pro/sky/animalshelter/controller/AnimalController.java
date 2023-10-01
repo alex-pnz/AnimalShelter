@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 import pro.sky.animalshelter.model.Animal;
+import pro.sky.animalshelter.service.AnimalService;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -16,6 +17,11 @@ import java.util.Collections;
 @RestController
 @RequestMapping("/api/v1/animals")
 public class AnimalController {
+    private final AnimalService animalService;
+
+    public AnimalController(AnimalService animalService) {
+        this.animalService = animalService;
+    }
 
     @GetMapping
     @Operation(
@@ -32,7 +38,7 @@ public class AnimalController {
             description = "Получение информации о животном по его идентификатору"
     )
     public Animal getAnimalById(@PathVariable @Parameter(description = "Идентификатор животного") Long id) {
-        return new Animal();
+        return animalService.getById(id);
     }
 
     @GetMapping("/shelter/{id}")
@@ -42,7 +48,7 @@ public class AnimalController {
     )
     public Collection<Animal> getAnimalsByShelter(
             @PathVariable(name = "id") @Parameter(description = "Идентификатор приюта") Long shelterId) {
-        return Collections.emptyList();
+        return animalService.getBydShelterId(shelterId);
     }
 
     @PostMapping
@@ -51,6 +57,6 @@ public class AnimalController {
             description = "Регистрация нового животного при его поступлении в приют"
     )
     public Animal addAnimal(@RequestBody @Parameter(description = "Информация о зверюге") Animal animal) {
-        return animal;
+        return animalService.createAnimal(animal);
     }
 }

@@ -14,11 +14,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.verification.VerificationMode;
-import org.springframework.beans.factory.annotation.Autowired;
-import pro.sky.animalshelter.service.MenuService;
-import pro.sky.animalshelter.service.MessageService;
-import pro.sky.animalshelter.service.VisitService;
-import pro.sky.animalshelter.service.VisitorService;
+import pro.sky.animalshelter.model.enums.Action;
+import pro.sky.animalshelter.service.*;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -31,6 +28,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.verify;
+import static pro.sky.animalshelter.model.enums.Action.*;
 import static pro.sky.animalshelter.utils.Constants.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -41,6 +39,8 @@ class TelegramBotUpdateListenerTest {
     private MenuService menuService;
     @Mock
     private MessageService messageService;
+    @Mock
+    private VolunteerService volunteerService;
     @Mock
     private VisitorService visitorService;
     @Mock
@@ -433,4 +433,166 @@ class TelegramBotUpdateListenerTest {
         return BotUtils.fromJson(json.replace("%text%", command), Update.class);
     }
 
+    // Testing showVolunteerMenu
+    static Stream<Arguments> provideParametersShowVolunteerMenu() {
+        return Stream.of(
+                Arguments.of(CALLBACK_START_VOLUNTEER_SESSION, atLeastOnce()),
+                Arguments.of("something else", never())
+        );
+    }
+    @ParameterizedTest
+    @MethodSource("provideParametersShowVolunteerMenu")
+    public void testShowVolunteerMenu(String callback, VerificationMode mode) throws URISyntaxException, IOException {
+
+        telegramBotUpdateListener.process(Collections.singletonList(getUpdate(callback,false)));
+
+        verify(menuService, mode).showVolunteerMenu(anyLong());
+        verify(volunteerService, mode).setVolunteerFree(anyLong(), anyBoolean());
+    }
+
+    // Testing showProbationTermsMenu
+    static Stream<Arguments> provideParametersShowProbationTermsMenu() {
+        return Stream.of(
+                Arguments.of(CALLBACK_CHANGE_PROBATION_TERMS, atLeastOnce()),
+                Arguments.of("something else", never())
+        );
+    }
+    @ParameterizedTest
+    @MethodSource("provideParametersShowProbationTermsMenu")
+    public void testShowProbationTermsMenu(String callback, VerificationMode mode) throws URISyntaxException, IOException {
+
+        telegramBotUpdateListener.process(Collections.singletonList(getUpdate(callback,false)));
+
+        verify(menuService, mode).showProbationTermsMenu(anyLong());
+    }
+
+    // Testing showVolunteerMenu
+    static Stream<Arguments> provideParametersSetVolunteerFree() {
+        return Stream.of(
+                Arguments.of(CALLBACK_END_VOLUNTEER_SESSION, atLeastOnce()),
+                Arguments.of("something else", never())
+        );
+    }
+    @ParameterizedTest
+    @MethodSource("provideParametersSetVolunteerFree")
+    public void testSetVolunteerFree(String callback, VerificationMode mode) throws URISyntaxException, IOException {
+
+        telegramBotUpdateListener.process(Collections.singletonList(getUpdate(callback,false)));
+
+        verify(volunteerService, mode).setVolunteerFree(anyLong(),anyBoolean());
+        verify(messageService, mode).sendMessage(anyLong(), anyString());
+    }
+
+    // Testing showListOfDocuments
+    static Stream<Arguments> provideParametersShowListOfDocuments() {
+        return Stream.of(
+                Arguments.of(CALLBACK_NECESSARY_PAPERS, atLeastOnce()),
+                Arguments.of("something else", never())
+        );
+    }
+    @ParameterizedTest
+    @MethodSource("provideParametersShowListOfDocuments")
+    public void testShowListOfDocuments(String callback, VerificationMode mode) throws URISyntaxException, IOException {
+
+        telegramBotUpdateListener.process(Collections.singletonList(getUpdate(callback,false)));
+
+        verify(messageService, mode).showListOfDocuments(anyLong());
+    }
+
+    // Testing showKittenPuppyInfo
+    static Stream<Arguments> provideParametersShowKittenPuppyInfo() {
+        return Stream.of(
+                Arguments.of(CALLBACK_KITTEN_HOUSE_INFO, atLeastOnce()),
+                Arguments.of(CALLBACK_PUPPY_HOUSE_INFO, atLeastOnce()),
+                Arguments.of("something else", never())
+        );
+    }
+    @ParameterizedTest
+    @MethodSource("provideParametersShowKittenPuppyInfo")
+    public void testShowKittenPuppyInfo(String callback, VerificationMode mode) throws URISyntaxException, IOException {
+
+        telegramBotUpdateListener.process(Collections.singletonList(getUpdate(callback,false)));
+
+        verify(messageService, mode).showKittenPuppyInfo(anyLong());
+    }
+
+    // Testing showAdultAnimalInfo
+    static Stream<Arguments> provideParametersShowAdultAnimalInfo() {
+        return Stream.of(
+                Arguments.of(CALLBACK_CAT_HOUSE_INFO, atLeastOnce()),
+                Arguments.of(CALLBACK_DOG_HOUSE_INFO, atLeastOnce()),
+                Arguments.of("something else", never())
+        );
+    }
+    @ParameterizedTest
+    @MethodSource("provideParametersShowAdultAnimalInfo")
+    public void testShowAdultAnimalInfo(String callback, VerificationMode mode) throws URISyntaxException, IOException {
+
+        telegramBotUpdateListener.process(Collections.singletonList(getUpdate(callback,false)));
+
+        verify(messageService, mode).showAdultAnimalInfo(anyLong());
+    }
+
+    // Testing doAction
+    static Stream<Arguments> provideParametersDoAction() {
+        return Stream.of(
+                Arguments.of(true, atLeastOnce()),
+                Arguments.of(false, never())
+        );
+    }
+    @ParameterizedTest
+    @MethodSource("provideParametersDoAction")
+    public void testDoAction(boolean b, VerificationMode mode) throws URISyntaxException, IOException {
+        when(volunteerService.isVolunteer(chatId)).thenReturn(b);
+        if(b){
+            when(volunteerService.isAction(chatId)).thenReturn(b);
+        }
+
+        telegramBotUpdateListener.process(Collections.singletonList(getUpdate("1", true)));
+
+        verify(chat, mode).doAction(any(), any());
+    }
+
+    //testing ProbationTermsMenu & VolunteerMenu
+
+    static Stream<Arguments> provideParametersSaveAction() {
+        String message = "Введите айди пользователя";
+        return Stream.of(
+                Arguments.of(CALLBACK_CONTACT_ADOPTER, atLeastOnce(), CALL_VISITOR, message),
+                Arguments.of(CALLBACK_SEND_ADOPTER_WARNING, atLeastOnce(), SEND_WARNING_MESSAGE, message),
+                Arguments.of(CALLBACK_ADD_14_DAYS, atLeastOnce(), ADD_14_DAYS, message),
+                Arguments.of(CALLBACK_ADD_30_DAYS, atLeastOnce(), ADD_30_DAYS, message),
+                Arguments.of(CALLBACK_COMPLETE_PROBATION_TERMS, atLeastOnce(), COMPLETE_PROBATION_TERMS, message),
+                Arguments.of(CALLBACK_FAIL_PROBATION_TERMS, atLeastOnce(), FAIL_PROBATION_TERMS, message),
+                Arguments.of("something else", never(), ADD_14_DAYS, message)
+        );
+    }
+    @ParameterizedTest
+    @MethodSource("provideParametersSaveAction")
+    public void testSaveAction(String callback, VerificationMode mode,
+                               Action action, String message)
+                                throws URISyntaxException, IOException {
+
+        telegramBotUpdateListener.process(Collections.singletonList(getUpdate(callback,false)));
+
+        verify(volunteerService, mode).saveAction(chatId, action);
+        verify(messageService, mode).sendMessage(chatId, message);
+    }
+
+    // Testing houseForAnimalWithDisabilities
+    static Stream<Arguments> provideParametersHouseForAnimalWithDisabilities() {
+        return Stream.of(
+                Arguments.of(CALLBACK_HANDICAPPED_ANIMAL_HOUSE_INFO, atLeastOnce()),
+                Arguments.of("any other message", never())
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideParametersHouseForAnimalWithDisabilities")
+    public void testHouseForAnimalWithDisabilities(String command, VerificationMode mode) throws URISyntaxException, IOException {
+        telegramBotUpdateListener.process(Collections.singletonList(getUpdate(command, false)));
+
+        verify(messageService, mode).houseForAnimalWithDisabilities(chatId);
+
+    }
 }

@@ -5,11 +5,13 @@ import com.pengrad.telegrambot.UpdatesListener;
 import com.pengrad.telegrambot.model.CallbackQuery;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
+import com.pengrad.telegrambot.response.SendResponse;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import pro.sky.animalshelter.model.Visitor;
+import pro.sky.animalshelter.model.enums.Action;
 import pro.sky.animalshelter.service.*;
 
 import java.util.List;
@@ -74,6 +76,9 @@ public class TelegramBotUpdateListener implements UpdatesListener {
                             messageService.defaultHandler(update);
                         }
                     }
+                }else if(volunteerService.isVolunteer(chatId) && volunteerService.isAction(chatId)){
+                    chat.doAction(chatId, text);
+
                     //проверка находится ли пользователь в чате с волонтером
                 } else if (chat.checkVisitor(chatId)) {
                     chat.continueChat(chatId, null, text);
@@ -103,8 +108,14 @@ public class TelegramBotUpdateListener implements UpdatesListener {
                     } // Войти как волонтер
 
                     // VolunteerMenu
-                    //case CALLBACK_CONTACT_ADOPTER -> ; // Связаться с опекуном
-                    //case CALLBACK_SEND_ADOPTER_WARNING -> ; // Отправить предупреждение
+                    case CALLBACK_CONTACT_ADOPTER -> {
+                        volunteerService.saveAction(chatId, Action.CALL_VISITOR);
+                        messageService.sendMessage(chatId,"Введите айди пользователя");
+                    } // Связаться с опекуном
+                    case CALLBACK_SEND_ADOPTER_WARNING -> {
+                        volunteerService.saveAction(chatId,Action.SEND_WARNING_MESSAGE);
+                        messageService.sendMessage(chatId,"Введите айди пользователя");
+                    } // Отправить предупреждение
                     case CALLBACK_CHANGE_PROBATION_TERMS -> menuService.showProbationTermsMenu(chatId) ; // Изменить состояние испытательного срока
                     case CALLBACK_END_VOLUNTEER_SESSION -> {
                         volunteerService.setVolunteerFree(chatId,false);
@@ -112,10 +123,22 @@ public class TelegramBotUpdateListener implements UpdatesListener {
                     } // Закончить смену
 
                     //ProbationTermsMenu
-                    //case CALLBACK_ADD_14_DAYS -> ;
-                    //case CALLBACK_ADD_30_DAYS -> ;
-                    //case CALLBACK_COMPLETE_PROBATION_TERMS -> ;
-                    //case CALLBACK_FAIL_PROBATION_TERMS -> ;
+                    case CALLBACK_ADD_14_DAYS -> {
+                        volunteerService.saveAction(chatId,Action.ADD_14_DAYS);
+                        messageService.sendMessage(chatId,"Введите айди пользователя");
+                    }
+                    case CALLBACK_ADD_30_DAYS -> {
+                        volunteerService.saveAction(chatId,Action.ADD_30_DAYS);
+                        messageService.sendMessage(chatId,"Введите айди пользователя");
+                    }
+                    case CALLBACK_COMPLETE_PROBATION_TERMS -> {
+                        volunteerService.saveAction(chatId,Action.COMPLETE_PROBATION_TERMS);
+                        messageService.sendMessage(chatId,"Введите айди пользователя");
+                    }
+                    case CALLBACK_FAIL_PROBATION_TERMS -> {
+                        volunteerService.saveAction(chatId,Action.FAIL_PROBATION_TERMS);
+                        messageService.sendMessage(chatId,"Введите айди пользователя");
+                    }
 
                     // ShelterMenu
                     case CALLBACK_SHELTER_INFO_MENU -> menuService.showShelterInfoMenu(chatId);
@@ -145,8 +168,9 @@ public class TelegramBotUpdateListener implements UpdatesListener {
                     case CALLBACK_DOG_HOUSE_INFO -> messageService.showAdultAnimalInfo(chatId); // Дом для взрослой собаки
                     case CALLBACK_DOG_WHISPERER_INFO -> messageService.showDogWhispererInfo(chatId);
                     case CALLBACK_BEST_KINOLOG_INFO -> messageService.showBestKinologInfo(chatId);
-                    //case CALLBACK_HANDICAPPED_ANIMAL_HOUSE_INFO -> ; // Дом для животного с ограниченными возможностями
+                    case CALLBACK_HANDICAPPED_ANIMAL_HOUSE_INFO -> messageService.houseForAnimalWithDisabilities(chatId); // Дом для животного с ограниченными возможностями
                     case CALLBACK_ADOPTION_REFUSAL_INFO -> messageService.showRefusePolicy(chatId);
+                    case CALLBACK_REPORT_SAMPLE -> messageService.showReportSample(chatId); // Пример написания отчета
 
                     default -> messageService.defaultHandler(update);
 
@@ -156,6 +180,5 @@ public class TelegramBotUpdateListener implements UpdatesListener {
         });
         return UpdatesListener.CONFIRMED_UPDATES_ALL;
     }
-
 
 }
