@@ -29,7 +29,7 @@ class ReportTest {
     }
 
     @Test
-    public void testSetter() {
+    public void testSetterId() {
         Report actualReport = new Report();
 
         actualReport.setId(expectedId);
@@ -46,6 +46,20 @@ class ReportTest {
         Assertions.assertThat(actualReport.getBehaviour()).isEqualTo(expectedBehaviour);
         Assertions.assertThat(actualReport.getOverallHealth()).isEqualTo(expectedHealth);
         Assertions.assertThat(actualReport.getAdoption().getId()).isEqualTo(1111L);
+    }
+    @Test
+    public void getImage() {
+        Report actualReport = new Report();
+        actualReport.setImage("Test Image");
+
+        Assertions.assertThat(actualReport.getImage()).isEqualTo("Test Image");
+    }
+    @Test
+    public void setImage() {
+        Report actualReport = new Report();
+        actualReport.setImage("Test Image");
+
+        Assertions.assertThat(actualReport.getImage()).isEqualTo("Test Image");
     }
 
 

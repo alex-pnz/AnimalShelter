@@ -12,6 +12,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.verification.VerificationMode;
 import pro.sky.animalshelter.model.enums.Action;
@@ -47,6 +48,8 @@ class TelegramBotUpdateListenerTest {
     private VisitService visitService;
     @Mock
     private ChatWithVolunteer chat;
+    @Mock
+    private ReportService reportService;
 
     @InjectMocks
     private TelegramBotUpdateListener telegramBotUpdateListener;
@@ -595,4 +598,93 @@ class TelegramBotUpdateListenerTest {
         verify(messageService, mode).houseForAnimalWithDisabilities(chatId);
 
     }
+
+    static Stream<Arguments> provideParametersHowToSendReport() {
+        return Stream.of(
+                Arguments.of(CALLBACK_SEND_REPORT_TO_VOLUNTEER, atLeastOnce()),
+                Arguments.of("any other message", never())
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideParametersHowToSendReport")
+    public void testHowToSendReport(String command, VerificationMode mode) throws URISyntaxException, IOException {
+        telegramBotUpdateListener.process(Collections.singletonList(getUpdate(command, false)));
+
+        verify(messageService, mode).howToSendReport(chatId);
+
+    }
+
+    static Stream<Arguments> provideParametersShowReportSample() {
+        return Stream.of(
+                Arguments.of(CALLBACK_REPORT_SAMPLE, atLeastOnce()),
+                Arguments.of("any other message", never())
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideParametersShowReportSample")
+    public void testShowReportSample(String command, VerificationMode mode) throws URISyntaxException, IOException {
+        telegramBotUpdateListener.process(Collections.singletonList(getUpdate(command, false)));
+
+        verify(messageService, mode).showReportSample(chatId);
+
+    }
+
+    @Test
+    // Testing Reports
+    public void checkReportTrue() {
+        when(reportService.checkReport(any())).thenReturn(true);
+        telegramBotUpdateListener.process(Collections.singletonList(getUpdateReportPhoto()));
+
+        ArgumentCaptor<SendMessage> argumentCaptor = ArgumentCaptor.forClass(SendMessage.class);
+        verify(bot).execute(argumentCaptor.capture());
+        SendMessage actual = argumentCaptor.getValue();
+
+        assertThat(actual.getParameters().get("chat_id")).isEqualTo(chatId);
+        assertThat(actual.getParameters().get("text")).isEqualTo(
+                GOOD_REPORT);
+    }
+    @Test
+    // Testing Reports
+    public void checkReportFalse() {
+        telegramBotUpdateListener.process(Collections.singletonList(getUpdateReportNoPhoto()));
+
+        ArgumentCaptor<SendMessage> argumentCaptor = ArgumentCaptor.forClass(SendMessage.class);
+        verify(bot).execute(argumentCaptor.capture());
+        SendMessage actual = argumentCaptor.getValue();
+
+        assertThat(actual.getParameters().get("chat_id")).isEqualTo(chatId);
+        assertThat(actual.getParameters().get("text")).isEqualTo(
+                BAD_REPORT);
+    }
+    // Вспомогательные методы для тестирования отчетов
+    private Update getUpdateReportPhoto() {
+        String json = """
+                {
+                  "message": {
+                    "chat": {
+                      "id": 123
+                    },
+                    "caption": "отчет  test Report",
+                    "photo": []
+                  }
+                }
+                """;
+        return BotUtils.fromJson(json, Update.class);
+    }
+    private Update getUpdateReportNoPhoto() {
+        String json = """
+                {
+                  "message": {
+                    "chat": {
+                      "id": 123
+                    },
+                    "caption": "отчет"
+                  }
+                }
+                """;
+        return BotUtils.fromJson(json, Update.class);
+    }
+
 }
