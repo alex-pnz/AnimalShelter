@@ -156,6 +156,7 @@ public class ReportService {
         Path filePath = Path.of(imagePath, update.message().chat().id() + "-" + currentDate.toString()
                 + "." + file.filePath().substring(file.filePath().lastIndexOf(".") + 1));
         Files.createDirectories(filePath.getParent());
+        Files.deleteIfExists(filePath);
         var out = Files.newOutputStream(filePath, CREATE_NEW);
         out.write(img);
         out.close();
