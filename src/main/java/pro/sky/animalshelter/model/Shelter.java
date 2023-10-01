@@ -36,7 +36,7 @@ public class Shelter {
 
     private LocalTime closingTime;
 
-   // @OneToMany
+    //@OneToMany
     //private List<Animal> animalsInShelter;
 
     public Long getId() {

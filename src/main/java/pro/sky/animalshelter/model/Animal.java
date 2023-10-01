@@ -27,6 +27,9 @@ public class Animal {
     private LocalDate admissionDate;
     @Column(columnDefinition = "TIMESTAMP")
     private LocalDate leaveDate;
+    @ManyToOne()
+    @JoinColumn(name="shelter_id")
+    private Shelter shelter;
 
 
     public Long getId() {
@@ -75,5 +78,13 @@ public class Animal {
 
     public void setLeaveDate(LocalDate leaveDate) {
         this.leaveDate = leaveDate;
+    }
+
+    public Shelter getShelter() {
+        return shelter;
+    }
+
+    public void setShelter(Shelter shelter) {
+        this.shelter = shelter;
     }
 }

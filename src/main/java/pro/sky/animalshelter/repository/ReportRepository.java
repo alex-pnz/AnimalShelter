@@ -5,10 +5,12 @@ import pro.sky.animalshelter.model.Adoption;
 import pro.sky.animalshelter.model.Report;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 public interface ReportRepository extends JpaRepository<Report, Long> {
-    Report findReportByAdoption(Adoption adoption);
+    Collection<Report> findReportByAdoptionId(Long id);
 
     List<Report> findReportByDate(LocalDate date);
 }
