@@ -56,6 +56,8 @@ class AnimalShelterApplicationTest {
     private VisitService visitService;
     @MockBean
     private VolunteerService volunteerService;
+    @MockBean
+    private ReportService reportService;
     @InjectMocks
     private AnimalShelterApplication animalShelterApplication;
 

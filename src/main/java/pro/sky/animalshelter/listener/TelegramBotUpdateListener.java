@@ -99,10 +99,10 @@ public class TelegramBotUpdateListener implements UpdatesListener {
                     //кнопка "обратно в меню"
                 } else if (isReport(update)){
                     if (!reportService.checkReport(update)) {
-                        SendMessage msg = new SendMessage(chatId, "Не бреши мне, падла");
+                        SendMessage msg = new SendMessage(chatId, BAD_REPORT);
                         bot.execute(msg);
                     } else {
-                        SendMessage msg = new SendMessage(chatId, "Вот и зашибись");
+                        SendMessage msg = new SendMessage(chatId, GOOD_REPORT);
                         bot.execute(msg);
                     }
                 } else {
