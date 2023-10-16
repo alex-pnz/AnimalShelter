@@ -17,5 +17,7 @@ databaseChangeLog:
       file: classpath:db/changelog/changes/008-adding-report-table.sql
   - include:
       file: classpath:db/changelog/changes/009-adding-shelter-id-for-animal.sql
+  - include:
+      file: classpath:db/changelog/changes/010-report-image-name-added.sql
 
 

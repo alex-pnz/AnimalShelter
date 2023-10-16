@@ -13,11 +13,12 @@ class ReportTest {
     private final String expectedBehaviour = "Test Behaviour";
     private final String expectedHealth = "Test Health";
     private final Adoption expectedAdoption = new Adoption();
+    private final String expectedImage = "Test/image/path.jpg";
 
     @Test
     public void testReportConstructor() {
         expectedAdoption.setId(1111L);
-        Report actualReport = new Report(123L, expectedDate, expectedDiet, expectedBehaviour, expectedHealth, expectedAdoption);
+        Report actualReport = new Report(123L, expectedDate, expectedDiet, expectedBehaviour, expectedHealth, expectedAdoption, expectedImage);
 
         Assertions.assertThat(actualReport.getId()).isEqualTo(expectedId);
         Assertions.assertThat(actualReport.getDate()).isEqualTo(expectedDate);
@@ -28,7 +29,7 @@ class ReportTest {
     }
 
     @Test
-    public void testSetter() {
+    public void testSetterId() {
         Report actualReport = new Report();
 
         actualReport.setId(expectedId);
@@ -45,6 +46,20 @@ class ReportTest {
         Assertions.assertThat(actualReport.getBehaviour()).isEqualTo(expectedBehaviour);
         Assertions.assertThat(actualReport.getOverallHealth()).isEqualTo(expectedHealth);
         Assertions.assertThat(actualReport.getAdoption().getId()).isEqualTo(1111L);
+    }
+    @Test
+    public void getImage() {
+        Report actualReport = new Report();
+        actualReport.setImage("Test Image");
+
+        Assertions.assertThat(actualReport.getImage()).isEqualTo("Test Image");
+    }
+    @Test
+    public void setImage() {
+        Report actualReport = new Report();
+        actualReport.setImage("Test Image");
+
+        Assertions.assertThat(actualReport.getImage()).isEqualTo("Test Image");
     }
 
 

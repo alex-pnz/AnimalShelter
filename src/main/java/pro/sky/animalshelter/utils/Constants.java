@@ -367,6 +367,11 @@ public class Constants {
     public final static String COMMAND_STOP_CHAT = "/stopChat";
 
     // Callbacks
+
+    public final static String BAD_REPORT = "Не бреши мне, падла";
+    public final static String GOOD_REPORT = "Вот и зашибись";
+
+
     // Main Menu
     public final static String CALLBACK_MENU_CAT = "cat";
     public final static String CALLBACK_MENU_DOG = "dog";

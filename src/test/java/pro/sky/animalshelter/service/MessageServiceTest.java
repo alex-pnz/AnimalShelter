@@ -4,6 +4,7 @@ import com.pengrad.telegrambot.BotUtils;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
+import com.pengrad.telegrambot.response.SendResponse;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -756,5 +757,62 @@ class MessageServiceTest {
         assertThat(actual.getParameters().get("text")).isEqualTo(PET_DISABILITY);
     }
 
+    static Stream<Arguments> provideParametersShowReportSampleFail() {
+        return Stream.of(
+                Arguments.of((Long) null),
+                Arguments.of(-123L)
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideParametersShowReportSampleFail")
+    public void showReportSampleFail(Long chatId) {
+
+        assertThrows(InvalidChatException.class, () -> messageService.showReportSample(chatId));
+
+    }
+
+    @Test
+    public void showReportSamplePass() {
+
+        messageService.showReportSample(chatId);
+
+        ArgumentCaptor<SendMessage> argumentCaptor = ArgumentCaptor.forClass(SendMessage.class);
+        verify(bot).execute(argumentCaptor.capture());
+        SendMessage actual = argumentCaptor.getValue();
+
+        assertThat(actual.getParameters().get("chat_id")).isEqualTo(chatId);
+        assertThat(actual.getParameters().get("text")).isEqualTo(REPORT_SAMPLE);
+    }
+    @Test
+    public void howToSendReport() {
+        messageService.howToSendReport(chatId);
+        ArgumentCaptor<SendMessage> argumentCaptor = ArgumentCaptor.forClass(SendMessage.class);
+        verify(bot).execute(argumentCaptor.capture());
+        SendMessage actual = argumentCaptor.getValue();
+
+        assertThat(actual.getParameters().get("chat_id")).isEqualTo(chatId);
+        assertThat(actual.getParameters().get("text")).isEqualTo("Отчет должен начинаться со слова \"Отчет\"");
+    }
+    @Test
+    public void reportFailureNoPicture() {
+        messageService.reportFailureNoPicture(chatId);
+        ArgumentCaptor<SendMessage> argumentCaptor = ArgumentCaptor.forClass(SendMessage.class);
+        verify(bot).execute(argumentCaptor.capture());
+        SendMessage actual = argumentCaptor.getValue();
+
+        assertThat(actual.getParameters().get("chat_id")).isEqualTo(chatId);
+        assertThat(actual.getParameters().get("text")).isEqualTo("Отчет не содержит фотографии");
+    }
+    @Test
+    public void reportFailureNoText() {
+        messageService.reportFailureNoText(chatId);
+        ArgumentCaptor<SendMessage> argumentCaptor = ArgumentCaptor.forClass(SendMessage.class);
+        verify(bot).execute(argumentCaptor.capture());
+        SendMessage actual = argumentCaptor.getValue();
+
+        assertThat(actual.getParameters().get("chat_id")).isEqualTo(chatId);
+        assertThat(actual.getParameters().get("text")).isEqualTo("Отчет не содержит описания");
+    }
 
 }

@@ -346,4 +346,31 @@ public class MessageService {
         throw new InvalidChatException();
     }
 
+    /**
+     * Метод, с рекомендациями о правильном составлении отчета
+     */
+    public SendResponse howToSendReport(Long chatId) {
+        SendMessage sendMessage = new SendMessage(chatId, "Отчет должен начинаться со слова \"Отчет\"");
+        return bot.execute(sendMessage);
+    }
+
+    /**
+     * Метод, сообщающий об отсутсвии фотографии питомца (или pythonца) в отчете
+     * @param chatId
+     * @return
+     */
+    public SendResponse reportFailureNoPicture(Long chatId) {
+        SendMessage sendMessage = new SendMessage(chatId, "Отчет не содержит фотографии");
+        return bot.execute(sendMessage);
+    }
+
+    /**
+     * Метод, сообщающий об отсутсвии описания состояния питомца в отчете
+     * @param chatId
+     * @return
+     */
+    public SendResponse reportFailureNoText(Long chatId) {
+        SendMessage sendMessage = new SendMessage(chatId, "Отчет не содержит описания");
+        return bot.execute(sendMessage);
+    }
 }
